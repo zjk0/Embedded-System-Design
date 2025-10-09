@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "dialog.h": "c",
+        "main.h": "c"
+    }
+}
