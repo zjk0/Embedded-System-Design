@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "crc.h"
+#include "i2c.h"
 #include "rtc.h"
 #include "gpio.h"
 
@@ -64,6 +65,19 @@ extern void GRAPHICS_MainTask(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void checkTouch (void) {
+  uint8_t buffer[6];
+  HAL_I2C_Mem_Read(&hi2c3, 0x70, 0x02, 1, buffer, 1, 1000);
+
+  if (buffer[0] > 0 && buffer[0] < 6) {
+    HAL_I2C_Mem_Read(&hi2c3, 0x70, 0x03, 1, buffer, 4, 1000);
+    GUI_TOUCH_StoreState((buffer[2] << 8 | buffer[3]) & 0x0FFF, (buffer[0] << 8 | buffer[1]) & 0x0FFF);
+  }
+  else {
+    GUI_TOUCH_StoreState(-1, -1);
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -97,6 +111,7 @@ int main(void)
   MX_GPIO_Init();
   MX_CRC_Init();
   MX_RTC_Init();
+  MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -166,7 +181,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC
+                              |RCC_PERIPHCLK_I2C3;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 200;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 5;
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
@@ -174,6 +190,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLLSAIDivQ = 1;
   PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_4;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInitStruct.I2c3ClockSelection = RCC_I2C3CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();

@@ -34,11 +34,13 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
-#define ID_TEXT_0     (GUI_ID_USER + 0x01)
-#define ID_TEXT_1     (GUI_ID_USER + 0x02)
-#define ID_TEXT_2     (GUI_ID_USER + 0x03)
-#define ID_TEXT_3     (GUI_ID_USER + 0x04)
+#define ID_WINDOW_0             (GUI_ID_USER + 0x00)
+#define ID_TEXT_0             (GUI_ID_USER + 0x01)
+#define ID_TEXT_1             (GUI_ID_USER + 0x02)
+#define ID_TEXT_2             (GUI_ID_USER + 0x03)
+#define ID_TEXT_3             (GUI_ID_USER + 0x04)
+#define ID_TEXT_4             (GUI_ID_USER + 0x05)
+#define ID_BUTTON_0             (GUI_ID_USER + 0x06)
 
 
 // USER START (Optionally insert additional defines)
@@ -59,11 +61,13 @@
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Window", ID_WINDOW_0, 0, 0, 480, 272, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Time: ", ID_TEXT_0, 5, 50, 60, 25, 0, 0x0, 0 },
+  { WINDOW_CreateIndirect, "Window", ID_WINDOW_0, 1, 1, 480, 272, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "Time: ", ID_TEXT_0, 5, 35, 60, 25, 0, 0x0, 0 },
   { TEXT_CreateIndirect, "Date: ", ID_TEXT_1, 5, 10, 60, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "00:00:00", ID_TEXT_2, 70, 50, 80, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "0000/00/00", ID_TEXT_3, 70, 10, 100, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "00:00:00", ID_TEXT_2, 55, 35, 80, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "0000/00/00", ID_TEXT_3, 55, 10, 100, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "WeekDay", ID_TEXT_4, 5, 60, 110, 25, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Settings", ID_BUTTON_0, 375, 10, 100, 50, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -77,12 +81,53 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
-RTC_DateTypeDef date;
-RTC_TimeTypeDef time;
-char time_str[10];
-char date_str[12];
-WM_HWIN time_item;
-WM_HWIN date_item;
+extern WM_HWIN CreateSettingsWindow(void);
+
+void update_date (WM_MESSAGE * pMsg) {
+  WM_HWIN time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
+  WM_HWIN date_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
+  WM_HWIN weekday_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+
+  RTC_DateTypeDef date;
+  RTC_TimeTypeDef time;
+  char time_str[10];
+  char date_str[12];
+  char weekday_str[11];
+
+  HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
+  sprintf(time_str, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
+  sprintf(date_str, "%04d/%02d/%02d", (2000 + date.Year), date.Month, date.Date);
+  switch (date.WeekDay) {
+    case RTC_WEEKDAY_MONDAY:
+      sprintf(weekday_str, "Monday");
+      break;
+    case RTC_WEEKDAY_TUESDAY:
+      sprintf(weekday_str, "Tuesday");
+      break;
+    case RTC_WEEKDAY_WEDNESDAY:
+      sprintf(weekday_str, "Wednesday");
+      break;
+    case RTC_WEEKDAY_THURSDAY:
+      sprintf(weekday_str, "Thursday");
+      break;
+    case RTC_WEEKDAY_FRIDAY:
+      sprintf(weekday_str, "Friday");
+      break;
+    case RTC_WEEKDAY_SATURDAY:
+      sprintf(weekday_str, "Saturday");
+      break;
+    case RTC_WEEKDAY_SUNDAY:
+      sprintf(weekday_str, "Sunday");
+      break;
+    default:
+      break;
+  }
+
+  TEXT_SetText(time_item, time_str);
+  TEXT_SetText(date_item, date_str);
+  TEXT_SetText(weekday_item, weekday_str);
+}
 
 // USER END
 
@@ -92,6 +137,8 @@ WM_HWIN date_item;
 */
 static void _cbDialog(WM_MESSAGE * pMsg) {
   WM_HWIN hItem;
+  int     NCode;
+  int     Id;
   // USER START (Optionally insert additional variables)
   // USER END
 
@@ -101,14 +148,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     // Initialization of 'Time: '
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
     //
     // Initialization of 'Date: '
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
     //
     // Initialization of '00:00:00'
     //
@@ -121,22 +168,53 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
     TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'WeekDay'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    TEXT_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Settings'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
-    time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
-    date_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
+    WM_CreateTimer(pMsg->hWin, 0, 1000, 0);
+    update_date(pMsg);
 
     // USER END
     break;
+  case WM_NOTIFY_PARENT:
+    Id    = WM_GetId(pMsg->hWinSrc);
+    NCode = pMsg->Data.v;
+    switch(Id) {
+    case ID_BUTTON_0: // Notifications sent by 'Settings'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        __HAL_RCC_RTC_DISABLE();
+        WM_DeleteWindow(pMsg->hWin);
+        CreateSettingsWindow();
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    // USER START (Optionally insert additional code for further Ids)
+    // USER END
+    }
+    break;
   // USER START (Optionally insert additional message handling)
-  case WM_PAINT:
-    HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
-    HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
-    sprintf(time_str, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-    sprintf(date_str, "%04d/%02d/%02d", (2000 + date.Year), date.Month, date.Date);
-    TEXT_SetText(time_item, time_str);
-    TEXT_SetText(date_item, date_str);
-    // WM_InvalidateWindow(pMsg->hWin);
+  case WM_TIMER:
+    update_date(pMsg);
+    WM_RestartTimer(pMsg->Data.v, 1000);
     break;
   // USER END
   default:

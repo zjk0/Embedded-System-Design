@@ -52,18 +52,23 @@ extern  WM_HWIN CreateWindow(void);
 void GRAPHICS_MainTask(void) {
 
   /* 2- Create a Window using GUIBuilder */
-  WM_HWIN hWin = CreateWindow();
+  CreateWindow();
  
 /* USER CODE BEGIN GRAPHICS_MainTask */
 
-// WM_HWIN hWin = CreateWindow(); a few change to CreateWindow()
-// WM_InvalidateWindow(hWin); put into while(1)
+  extern void checkTouch (void);
+
+  while(1)
+  {
+    GUI_Delay(100);
+    checkTouch();
+    
+  }
 
 /* USER CODE END GRAPHICS_MainTask */
   while(1)
 {
       GUI_Delay(100);
-      WM_InvalidateWindow(hWin);
 }
 }
 
