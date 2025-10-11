@@ -56,12 +56,17 @@ void GRAPHICS_MainTask(void) {
  
 /* USER CODE BEGIN GRAPHICS_MainTask */
 
+  extern uint32_t usedMemory;
+  extern uint32_t freeMemory;
+
   extern void checkTouch (void);
 
   while(1)
   {
     GUI_Delay(100);
     checkTouch();
+    usedMemory = GUI_ALLOC_GetNumUsedBytes();
+    freeMemory = GUI_ALLOC_GetNumFreeBytes();
     
   }
 

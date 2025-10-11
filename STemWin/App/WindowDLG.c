@@ -81,6 +81,9 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
+uint32_t usedMemory;
+uint32_t freeMemory;
+
 extern WM_HWIN CreateSettingsWindow(void);
 
 void update_date (WM_MESSAGE * pMsg) {

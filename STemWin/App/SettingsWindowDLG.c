@@ -161,207 +161,63 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
-    //
-    // Initialization of 'Hours'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
-    DROPDOWN_AddString(hItem, "0");
-    DROPDOWN_AddString(hItem, "1");
-    DROPDOWN_AddString(hItem, "2");
-    DROPDOWN_AddString(hItem, "3");
-    DROPDOWN_AddString(hItem, "4");
-    DROPDOWN_AddString(hItem, "5");
-    DROPDOWN_AddString(hItem, "6");
-    DROPDOWN_AddString(hItem, "7");
-    DROPDOWN_AddString(hItem, "8");
-    DROPDOWN_AddString(hItem, "9");
-    DROPDOWN_AddString(hItem, "10");
-    DROPDOWN_AddString(hItem, "11");
-    DROPDOWN_AddString(hItem, "12");
-    DROPDOWN_AddString(hItem, "13");
-    DROPDOWN_AddString(hItem, "14");
-    DROPDOWN_AddString(hItem, "15");
-    DROPDOWN_AddString(hItem, "16");
-    DROPDOWN_AddString(hItem, "17");
-    DROPDOWN_AddString(hItem, "18");
-    DROPDOWN_AddString(hItem, "19");
-    DROPDOWN_AddString(hItem, "20");
-    DROPDOWN_AddString(hItem, "21");
-    DROPDOWN_AddString(hItem, "22");
-    DROPDOWN_AddString(hItem, "23");
-    //
-    // Initialization of 'Minutes'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
-    DROPDOWN_AddString(hItem, "0");
-    DROPDOWN_AddString(hItem, "1");
-    DROPDOWN_AddString(hItem, "2");
-    DROPDOWN_AddString(hItem, "3");
-    DROPDOWN_AddString(hItem, "4");
-    DROPDOWN_AddString(hItem, "5");
-    DROPDOWN_AddString(hItem, "6");
-    DROPDOWN_AddString(hItem, "7");
-    DROPDOWN_AddString(hItem, "8");
-    DROPDOWN_AddString(hItem, "9");
-    DROPDOWN_AddString(hItem, "10");
-    DROPDOWN_AddString(hItem, "11");
-    DROPDOWN_AddString(hItem, "12");
-    DROPDOWN_AddString(hItem, "13");
-    DROPDOWN_AddString(hItem, "14");
-    DROPDOWN_AddString(hItem, "15");
-    DROPDOWN_AddString(hItem, "16");
-    DROPDOWN_AddString(hItem, "17");
-    DROPDOWN_AddString(hItem, "18");
-    DROPDOWN_AddString(hItem, "19");
-    DROPDOWN_AddString(hItem, "20");
-    DROPDOWN_AddString(hItem, "21");
-    DROPDOWN_AddString(hItem, "22");
-    DROPDOWN_AddString(hItem, "23");
-    DROPDOWN_AddString(hItem, "24");
-    DROPDOWN_AddString(hItem, "25");
-    DROPDOWN_AddString(hItem, "26");
-    DROPDOWN_AddString(hItem, "27");
-    DROPDOWN_AddString(hItem, "28");
-    DROPDOWN_AddString(hItem, "29");
-    DROPDOWN_AddString(hItem, "30");
-    DROPDOWN_AddString(hItem, "31");
-    DROPDOWN_AddString(hItem, "32");
-    DROPDOWN_AddString(hItem, "33");
-    DROPDOWN_AddString(hItem, "34");
-    DROPDOWN_AddString(hItem, "35");
-    DROPDOWN_AddString(hItem, "36");
-    DROPDOWN_AddString(hItem, "37");
-    DROPDOWN_AddString(hItem, "38");
-    DROPDOWN_AddString(hItem, "39");
-    DROPDOWN_AddString(hItem, "40");
-    DROPDOWN_AddString(hItem, "41");
-    DROPDOWN_AddString(hItem, "42");
-    DROPDOWN_AddString(hItem, "43");
-    DROPDOWN_AddString(hItem, "44");
-    DROPDOWN_AddString(hItem, "45");
-    DROPDOWN_AddString(hItem, "46");
-    DROPDOWN_AddString(hItem, "47");
-    DROPDOWN_AddString(hItem, "48");
-    DROPDOWN_AddString(hItem, "49");
-    DROPDOWN_AddString(hItem, "50");
-    DROPDOWN_AddString(hItem, "51");
-    DROPDOWN_AddString(hItem, "52");
-    DROPDOWN_AddString(hItem, "53");
-    DROPDOWN_AddString(hItem, "54");
-    DROPDOWN_AddString(hItem, "55");
-    DROPDOWN_AddString(hItem, "56");
-    DROPDOWN_AddString(hItem, "57");
-    DROPDOWN_AddString(hItem, "58");
-    DROPDOWN_AddString(hItem, "59");
     // USER START (Optionally insert additional code for further widget initialization)
+
+    char buffer[10];
 
     // Set hours dropdown
     hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
     DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 80);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 0; i < 24; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
     // Set minutes dropdown
     hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
     DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 120);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 0; i < 60; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
     // // Set seconds dropdown
     hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_2);
     DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 120);
-    DROPDOWN_AddString(hItem, "0");
-    DROPDOWN_AddString(hItem, "1");
-    DROPDOWN_AddString(hItem, "2");
-    DROPDOWN_AddString(hItem, "3");
-    DROPDOWN_AddString(hItem, "4");
-    DROPDOWN_AddString(hItem, "5");
-    DROPDOWN_AddString(hItem, "6");
-    DROPDOWN_AddString(hItem, "7");
-    DROPDOWN_AddString(hItem, "8");
-    DROPDOWN_AddString(hItem, "9");
-    DROPDOWN_AddString(hItem, "10");
-    DROPDOWN_AddString(hItem, "11");
-    DROPDOWN_AddString(hItem, "12");
-    DROPDOWN_AddString(hItem, "13");
-    DROPDOWN_AddString(hItem, "14");
-    DROPDOWN_AddString(hItem, "15");
-    DROPDOWN_AddString(hItem, "16");
-    DROPDOWN_AddString(hItem, "17");
-    DROPDOWN_AddString(hItem, "18");
-    DROPDOWN_AddString(hItem, "19");
-    DROPDOWN_AddString(hItem, "20");
-    DROPDOWN_AddString(hItem, "21");
-    DROPDOWN_AddString(hItem, "22");
-    DROPDOWN_AddString(hItem, "23");
-    DROPDOWN_AddString(hItem, "24");
-    DROPDOWN_AddString(hItem, "25");
-    DROPDOWN_AddString(hItem, "26");
-    DROPDOWN_AddString(hItem, "27");
-    DROPDOWN_AddString(hItem, "28");
-    DROPDOWN_AddString(hItem, "29");
-    DROPDOWN_AddString(hItem, "30");
-    DROPDOWN_AddString(hItem, "31");
-    DROPDOWN_AddString(hItem, "32");
-    DROPDOWN_AddString(hItem, "33");
-    DROPDOWN_AddString(hItem, "34");
-    DROPDOWN_AddString(hItem, "35");
-    DROPDOWN_AddString(hItem, "36");
-    DROPDOWN_AddString(hItem, "37");
-    DROPDOWN_AddString(hItem, "38");
-    DROPDOWN_AddString(hItem, "39");
-    DROPDOWN_AddString(hItem, "40");
-    DROPDOWN_AddString(hItem, "41");
-    DROPDOWN_AddString(hItem, "42");
-    DROPDOWN_AddString(hItem, "43");
-    DROPDOWN_AddString(hItem, "44");
-    DROPDOWN_AddString(hItem, "45");
-    DROPDOWN_AddString(hItem, "46");
-    DROPDOWN_AddString(hItem, "47");
-    DROPDOWN_AddString(hItem, "48");
-    DROPDOWN_AddString(hItem, "49");
-    DROPDOWN_AddString(hItem, "50");
-    DROPDOWN_AddString(hItem, "51");
-    DROPDOWN_AddString(hItem, "52");
-    DROPDOWN_AddString(hItem, "53");
-    DROPDOWN_AddString(hItem, "54");
-    DROPDOWN_AddString(hItem, "55");
-    DROPDOWN_AddString(hItem, "56");
-    DROPDOWN_AddString(hItem, "57");
-    DROPDOWN_AddString(hItem, "58");
-    DROPDOWN_AddString(hItem, "59");
-    // DROPDOWN_SetAutoScroll(hDropdown, 1);
-    // DROPDOWN_SetListHeight(hDropdown, 60);
-    // for (int i = 0; i < 60; i++) {
-    //   sprintf(buffer, "%d", i);
-    //   DROPDOWN_AddString(hItem, buffer);
-    // }
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 0; i < 60; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
-    // // Set year dropdown
-    // hDropdown = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_3);
-    // DROPDOWN_SetAutoScroll(hDropdown, 1);
-    // DROPDOWN_SetListHeight(hDropdown, 60);
-    // for (int i = 2000; i < 2100; i++) {
-    //   sprintf(buffer, "%d", i);
-    //   DROPDOWN_AddString(hDropdown, buffer);
-    // }
+    // Set year dropdown
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_3);
+    DROPDOWN_SetAutoScroll(hItem, 1);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 2000; i < 2100; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
-    // // Set month dropdown
-    // hDropdown = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_4);
-    // DROPDOWN_SetAutoScroll(hDropdown, 1);
-    // DROPDOWN_SetListHeight(hDropdown, 60);
-    // for (int i = 1; i <= 12; i++) {
-    //   sprintf(buffer, "%d", i);
-    //   DROPDOWN_AddString(hDropdown, buffer);
-    // }
+    // Set month dropdown
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_4);
+    DROPDOWN_SetAutoScroll(hItem, 1);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 1; i <= 12; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
-    // // Set date dropdown
-    // hDropdown = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_5);
-    // DROPDOWN_SetAutoScroll(hDropdown, 1);
-    // DROPDOWN_SetListHeight(hDropdown, 60);
-    // for (int i = 1; i <= 31; i++) {
-    //   sprintf(buffer, "%d", i);
-    //   DROPDOWN_AddString(hDropdown, buffer);
-    // }
+    // Set date dropdown
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_5);
+    DROPDOWN_SetAutoScroll(hItem, 1);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 1; i <= 31; i++) {
+      sprintf(buffer, "%d", i);
+      DROPDOWN_AddString(hItem, buffer);
+    }
 
     // USER END
     break;
