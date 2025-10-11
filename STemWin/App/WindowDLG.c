@@ -81,10 +81,11 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
-uint32_t usedMemory;
-uint32_t freeMemory;
-
 extern WM_HWIN CreateSettingsWindow(void);
+extern WM_HWIN CreateAlarmWindow(void);
+extern int is_alarm (void);
+
+extern int enable_alarm;
 
 void update_date (WM_MESSAGE * pMsg) {
   WM_HWIN time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
@@ -197,7 +198,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
-        __HAL_RCC_RTC_DISABLE();
         WM_DeleteWindow(pMsg->hWin);
         CreateSettingsWindow();
         // USER END
@@ -218,6 +218,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
   case WM_TIMER:
     update_date(pMsg);
     WM_RestartTimer(pMsg->Data.v, 1000);
+    if (is_alarm() && enable_alarm) {
+      WM_DeleteWindow(pMsg->hWin);
+      CreateAlarmWindow();
+    }
     break;
   // USER END
   default:

@@ -1086,6 +1086,15 @@
         <group>
           <name>App</name>
           <file>
+            <name>$PROJ_DIR$\..\STemWin\App\AlarmWindowDLG.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\STemWin\App\SetAlarmWindowDLG.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\STemWin\App\SetTimeWindowDLG.c</name>
+          </file>
+          <file>
             <name>$PROJ_DIR$\..\STemWin\App\SettingsWindowDLG.c</name>
           </file>
           <file>

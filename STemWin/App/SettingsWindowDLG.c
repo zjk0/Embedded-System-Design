@@ -21,8 +21,6 @@
 // USER START (Optionally insert additional includes)
 
 #include "main.h"
-#include "rtc.h"
-#include "stdio.h"
 
 // USER END
 
@@ -35,20 +33,9 @@
 **********************************************************************
 */
 #define ID_WINDOW_0     (GUI_ID_USER + 0x00)
-#define ID_TEXT_0     (GUI_ID_USER + 0x01)
-#define ID_TEXT_1     (GUI_ID_USER + 0x02)
-#define ID_TEXT_2     (GUI_ID_USER + 0x03)
-#define ID_TEXT_3     (GUI_ID_USER + 0x04)
-#define ID_TEXT_4     (GUI_ID_USER + 0x05)
-#define ID_TEXT_5     (GUI_ID_USER + 0x06)
-#define ID_TEXT_6     (GUI_ID_USER + 0x07)
-#define ID_BUTTON_0     (GUI_ID_USER + 0x08)
-#define ID_DROPDOWN_0     (GUI_ID_USER + 0x09)
-#define ID_DROPDOWN_1     (GUI_ID_USER + 0x0A)
-#define ID_DROPDOWN_2     (GUI_ID_USER + 0x0B)
-#define ID_DROPDOWN_3     (GUI_ID_USER + 0x0C)
-#define ID_DROPDOWN_4     (GUI_ID_USER + 0x0D)
-#define ID_DROPDOWN_5     (GUI_ID_USER + 0x0E)
+#define ID_BUTTON_0     (GUI_ID_USER + 0x01)
+#define ID_BUTTON_1     (GUI_ID_USER + 0x02)
+#define ID_BUTTON_2     (GUI_ID_USER + 0x03)
 
 
 // USER START (Optionally insert additional defines)
@@ -69,21 +56,10 @@
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "SettingsWindow", ID_WINDOW_0, 2, 1, 480, 272, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Time Settngs", ID_TEXT_0, 5, 5, 120, 25, 0, 0x64, 0 },
-  { TEXT_CreateIndirect, "Hours", ID_TEXT_1, 5, 70, 80, 20, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Minutes", ID_TEXT_2, 140, 70, 80, 20, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Seconds", ID_TEXT_3, 275, 70, 80, 20, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Year", ID_TEXT_4, 5, 150, 80, 20, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Month", ID_TEXT_5, 140, 150, 80, 20, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Date", ID_TEXT_6, 275, 150, 80, 20, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Quit", ID_BUTTON_0, 375, 10, 100, 50, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Hours", ID_DROPDOWN_0, 45, 70, 80, 18, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Minutes", ID_DROPDOWN_1, 190, 70, 80, 18, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Seconds", ID_DROPDOWN_2, 330, 70, 80, 18, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Year", ID_DROPDOWN_3, 40, 150, 80, 18, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Month", ID_DROPDOWN_4, 180, 150, 80, 18, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Date", ID_DROPDOWN_5, 310, 150, 80, 18, 0, 0x0, 0 },
+  { WINDOW_CreateIndirect, "SettingsWindow", ID_WINDOW_0, 0, 0, 480, 272, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "set time", ID_BUTTON_0, 10, 10, 100, 50, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "set alarm", ID_BUTTON_1, 10, 70, 100, 50, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Quit", ID_BUTTON_2, 375, 10, 100, 50, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -97,6 +73,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
+extern WM_HWIN CreateSetTimeWindow(void);
+extern WM_HWIN CreateSetAlarmWindow(void);
 extern WM_HWIN CreateWindow(void);
 
 // USER END
@@ -115,234 +93,69 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
   switch (pMsg->MsgId) {
   case WM_INIT_DIALOG:
     //
-    // Initialization of 'Time Settngs'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-    TEXT_SetFont(hItem, GUI_FONT_20_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    //
-    // Initialization of 'Hours'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    //
-    // Initialization of 'Minutes'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    //
-    // Initialization of 'Seconds'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    //
-    // Initialization of 'Year'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    //
-    // Initialization of 'Month'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_5);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    //
-    // Initialization of 'Date'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_6);
-    TEXT_SetFont(hItem, GUI_FONT_16_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    //
-    // Initialization of 'Quit'
+    // Initialization of 'set time'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'set alarm'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Quit'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
-
-    char buffer[10];
-
-    // Set hours dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 0; i < 24; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
-    // Set minutes dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 0; i < 60; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
-    // // Set seconds dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_2);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 0; i < 60; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
-    // Set year dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_3);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 2000; i < 2100; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
-    // Set month dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_4);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 1; i <= 12; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
-    // Set date dropdown
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_5);
-    DROPDOWN_SetAutoScroll(hItem, 1);
-    DROPDOWN_SetListHeight(hItem, 100);
-    for (int i = 1; i <= 31; i++) {
-      sprintf(buffer, "%d", i);
-      DROPDOWN_AddString(hItem, buffer);
-    }
-
     // USER END
     break;
   case WM_NOTIFY_PARENT:
     Id    = WM_GetId(pMsg->hWinSrc);
     NCode = pMsg->Data.v;
     switch(Id) {
-    case ID_BUTTON_0: // Notifications sent by 'Quit'
+    case ID_BUTTON_0: // Notifications sent by 'set time'
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
-        __HAL_RCC_RTC_ENABLE();
+        __HAL_RCC_RTC_DISABLE();
+        WM_DeleteWindow(pMsg->hWin);
+        CreateSetTimeWindow();
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_1: // Notifications sent by 'set alarm'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        WM_DeleteWindow(pMsg->hWin);
+        CreateSetAlarmWindow();
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_2: // Notifications sent by 'Quit'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
         WM_DeleteWindow(pMsg->hWin);
         CreateWindow();
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_0: // Notifications sent by 'Hours'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_1: // Notifications sent by 'Minutes'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_2: // Notifications sent by 'Seconds'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_3: // Notifications sent by 'Year'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_4: // Notifications sent by 'Month'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_DROPDOWN_5: // Notifications sent by 'Date'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
         // USER END
         break;

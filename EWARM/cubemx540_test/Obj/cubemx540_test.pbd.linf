@@ -1,4 +1,5 @@
 ﻿F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\cubemx540_test.pbd
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\AlarmWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\crc.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\gpio.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\GUI_App.pbi
@@ -8,6 +9,8 @@ F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_tes
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\i2c.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\main.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\rtc.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SetAlarmWindowDLG.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SetTimeWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SettingsWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\STemwin_wrapper.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal.pbi
