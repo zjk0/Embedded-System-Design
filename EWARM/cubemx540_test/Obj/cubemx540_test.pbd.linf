@@ -1,6 +1,13 @@
 ﻿F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\cubemx540_test.pbd
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\AlarmWindowDLG.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\bsp_driver_sd.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\cc936.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\crc.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\diskio.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\dma.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\fatfs.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\ff.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\ff_gen_drv.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\gpio.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\GUI_App.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\GUI_X.pbi
@@ -9,6 +16,8 @@ F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_tes
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\i2c.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\main.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\rtc.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\sd_diskio.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\sdmmc.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SetAlarmWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SetTimeWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\SettingsWindowDLG.pbi
@@ -35,11 +44,14 @@ F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_tes
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_rcc_ex.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_rtc.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_rtc_ex.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_sd.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_sdram.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_tim.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_hal_tim_ex.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_it.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_ll_fmc.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\stm32f7xx_ll_sdmmc.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\sys.pbi
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\syscall.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\system_stm32f7xx.pbi
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\cubemx540_test\Obj\WindowDLG.pbi

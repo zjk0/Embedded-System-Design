@@ -358,6 +358,9 @@
           <state>$PROJ_DIR$/../STemWin/Target</state>
           <state>$PROJ_DIR$/../STemWin/App</state>
           <state>$PROJ_DIR$/../Middlewares/ST/STemWin/inc</state>
+          <state>$PROJ_DIR$/../FATFS/Target</state>
+          <state>$PROJ_DIR$/../FATFS/App</state>
+          <state>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1066,10 +1069,16 @@
           <name>$PROJ_DIR$\..\Core\Src\crc.c</name>
         </file>
         <file>
+          <name>$PROJ_DIR$/../Core/Src/dma.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\Core\Src\i2c.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\rtc.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/sdmmc.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\sys.c</name>
@@ -1114,6 +1123,24 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\STemWin\Target\STemwin_wrapper.c</name>
+          </file>
+        </group>
+      </group>
+      <group>
+        <name>FATFS</name>
+        <group>
+          <name>Target</name>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/Target/bsp_driver_sd.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/Target/sd_diskio.c</name>
+          </file>
+        </group>
+        <group>
+          <name>App</name>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/App/fatfs.c</name>
           </file>
         </group>
       </group>
@@ -1199,6 +1226,12 @@
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</name>
       </file>
       <file>
@@ -1215,6 +1248,24 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\Middlewares\ST\STemWin\OS\GUI_X.c</name>
+      </file>
+    </group>
+    <group>
+      <name>FatFs</name>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/diskio.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/syscall.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/cc936.c</name>
       </file>
     </group>
   </group>

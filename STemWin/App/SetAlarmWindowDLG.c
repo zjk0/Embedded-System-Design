@@ -120,7 +120,9 @@ void set_alarm_dropdown_time_init (WM_MESSAGE * pMsg) {
 
 int is_alarm (void) {
   RTC_TimeTypeDef time;
+  RTC_DateTypeDef date;
   HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 
   if (time.Hours == alarm_hours && time.Minutes == alarm_minutes && time.Seconds == alarm_seconds) {
     return 1;
