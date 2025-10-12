@@ -1066,10 +1066,13 @@
           <name>$PROJ_DIR$\..\Core\Src\gpio.c</name>
         </file>
         <file>
+          <name>$PROJ_DIR$\..\Core\Src\adc.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\Core\Src\crc.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$/../Core/Src/dma.c</name>
+          <name>$PROJ_DIR$\..\Core\Src\dma.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\i2c.c</name>
@@ -1078,7 +1081,7 @@
           <name>$PROJ_DIR$\..\Core\Src\rtc.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$/../Core/Src/sdmmc.c</name>
+          <name>$PROJ_DIR$\..\Core\Src\sdmmc.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\sys.c</name>
@@ -1089,6 +1092,24 @@
         <file>
           <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_msp.c</name>
         </file>
+      </group>
+      <group>
+        <name>FATFS</name>
+        <group>
+          <name>App</name>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\App\fatfs.c</name>
+          </file>
+        </group>
+        <group>
+          <name>Target</name>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\Target\bsp_driver_sd.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\Target\sd_diskio.c</name>
+          </file>
+        </group>
       </group>
       <group>
         <name>STemWin</name>
@@ -1105,6 +1126,12 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\STemWin\App\SettingsWindowDLG.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\STemWin\App\ShowWaveSignalWindowDLG.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\STemWin\App\WaveSignalWindowDLG.c</name>
           </file>
           <file>
             <name>$PROJ_DIR$\..\STemWin\App\GUI_App.c</name>
@@ -1126,24 +1153,9 @@
           </file>
         </group>
       </group>
-      <group>
-        <name>FATFS</name>
-        <group>
-          <name>Target</name>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/Target/bsp_driver_sd.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/Target/sd_diskio.c</name>
-          </file>
-        </group>
-        <group>
-          <name>App</name>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/App/fatfs.c</name>
-          </file>
-        </group>
-      </group>
+      <file>
+        <name>$PROJ_DIR$\..\ChineseStr\chinese_str.c</name>
+      </file>
     </group>
   </group>
   <group>
@@ -1214,6 +1226,12 @@
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dsi.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc_ex.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc.c</name>
       </file>
       <file>
@@ -1226,10 +1244,10 @@
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c</name>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_sdmmc.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c</name>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sd.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</name>
@@ -1242,30 +1260,30 @@
   <group>
     <name>Middlewares</name>
     <group>
+      <name>FatFs</name>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\diskio.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\ff.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\option\syscall.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\option\cc936.c</name>
+      </file>
+    </group>
+    <group>
       <name>STemWin</name>
       <file>
         <name>$PROJ_DIR$\..\Middlewares\ST\STemWin\Lib\STemWin_CM7_wc32_ot_ARGB.a</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Middlewares\ST\STemWin\OS\GUI_X.c</name>
-      </file>
-    </group>
-    <group>
-      <name>FatFs</name>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/diskio.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/syscall.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/cc936.c</name>
       </file>
     </group>
   </group>

@@ -57,6 +57,10 @@ void GRAPHICS_MainTask(void) {
 /* USER CODE BEGIN GRAPHICS_MainTask */
 
   extern void checkTouch (void);
+  extern void create_xbf_font (void);
+
+  GUI_UC_SetEncodeUTF8();
+  create_xbf_font();
 
   while(1)
   {

@@ -161,9 +161,6 @@ void set_rtc_time (int hours, int minutes, int seconds, int year, int month, int
   Time.Seconds = seconds;
   Time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   Time.StoreOperation = RTC_STOREOPERATION_RESET;
-  if (HAL_RTC_SetTime(&hrtc, &Time, RTC_FORMAT_BIN) != HAL_OK) {
-    Error_Handler();
-  }
 
   Date.Year = year;
   Date.Month = month;
@@ -193,6 +190,10 @@ void set_rtc_time (int hours, int minutes, int seconds, int year, int month, int
       break;
     default:
       break;
+  }
+
+  if (HAL_RTC_SetTime(&hrtc, &Time, RTC_FORMAT_BIN) != HAL_OK) {
+    Error_Handler();
   }
   if (HAL_RTC_SetDate(&hrtc, &Date, RTC_FORMAT_BIN) != HAL_OK) {
     Error_Handler();

@@ -1,0 +1,1 @@
+﻿const char* settings = "时间：";

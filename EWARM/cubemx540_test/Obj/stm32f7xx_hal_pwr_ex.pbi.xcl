@@ -21,6 +21,12 @@ F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM/../STemWin/Ap
 -I
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM/../Middlewares/ST/STemWin/inc
 -I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM/../FATFS/Target
+-I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM/../FATFS/App
+-I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM/../Middlewares/Third_Party/FatFs/src
+-I
 F:\EWARM_8321\arm\inc
 -I
 F:\EWARM_8321\arm\inc\c
@@ -40,6 +46,12 @@ F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\STemWin\Target
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\STemWin\App
 -I
 F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\Middlewares\ST\STemWin\inc
+-I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\FATFS\Target
+-I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\FATFS\App
+-I
+F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\Middlewares\Third_Party\FatFs\src
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0

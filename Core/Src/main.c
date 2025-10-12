@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "crc.h"
 #include "dma.h"
 #include "fatfs.h"
@@ -118,6 +119,7 @@ int main(void)
   MX_DMA_Init();
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
+  MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

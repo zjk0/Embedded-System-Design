@@ -23,6 +23,10 @@
 #include "main.h"
 #include "rtc.h"
 #include "stdio.h"
+#include "ffconf.h"
+#include "ff.h"
+#include "ff_gen_drv.h"
+#include "diskio.h"
 
 // USER END
 
@@ -34,13 +38,11 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0             (GUI_ID_USER + 0x00)
-#define ID_TEXT_0             (GUI_ID_USER + 0x01)
-#define ID_TEXT_1             (GUI_ID_USER + 0x02)
-#define ID_TEXT_2             (GUI_ID_USER + 0x03)
-#define ID_TEXT_3             (GUI_ID_USER + 0x04)
-#define ID_TEXT_4             (GUI_ID_USER + 0x05)
-#define ID_BUTTON_0             (GUI_ID_USER + 0x06)
+#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
+#define ID_TEXT_0     (GUI_ID_USER + 0x03)
+#define ID_TEXT_1     (GUI_ID_USER + 0x04)
+#define ID_TEXT_2     (GUI_ID_USER + 0x05)
+#define ID_BUTTON_0     (GUI_ID_USER + 0x06)
 
 
 // USER START (Optionally insert additional defines)
@@ -62,11 +64,9 @@
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { WINDOW_CreateIndirect, "Window", ID_WINDOW_0, 1, 1, 480, 272, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Time: ", ID_TEXT_0, 5, 35, 60, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Date: ", ID_TEXT_1, 5, 10, 60, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "00:00:00", ID_TEXT_2, 55, 35, 80, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "0000/00/00", ID_TEXT_3, 55, 10, 100, 25, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "WeekDay", ID_TEXT_4, 5, 60, 110, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "00:00:00", ID_TEXT_0, 200, 140, 80, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "0000/00/00", ID_TEXT_1, 190, 100, 100, 25, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "WeekDay", ID_TEXT_2, 185, 180, 110, 25, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Settings", ID_BUTTON_0, 375, 10, 100, 50, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
@@ -87,10 +87,21 @@ extern int is_alarm (void);
 
 extern int enable_alarm;
 
+static const char root_dir[] = "";  // The root dir of TF card
+static const char chinese_font_36_addr[] = "Font/ChineseFont.xbf";
+GUI_XBF_DATA ChineseFont_36_XBF;
+GUI_FONT ChineseFont_36;
+extern const char* settings;
+
+uint8_t fatfs_init_flag = 0;
+FATFS fs;
+FIL fp;
+UINT bytes_read;
+
 void update_date (WM_MESSAGE * pMsg) {
-  WM_HWIN time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
-  WM_HWIN date_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
-  WM_HWIN weekday_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+  WM_HWIN time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
+  WM_HWIN date_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
+  WM_HWIN weekday_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
 
   RTC_DateTypeDef date;
   RTC_TimeTypeDef time;
@@ -133,6 +144,32 @@ void update_date (WM_MESSAGE * pMsg) {
   TEXT_SetText(weekday_item, weekday_str);
 }
 
+static int _cb_Font_XBF_GetData (U32 offset, U16 num_bytes, void* pVoid, void* pBuffer) {
+  if (fatfs_init_flag == 0) {
+    f_mount(&fs, (const TCHAR*)root_dir, 1);
+    fatfs_init_flag = 1;
+  }
+
+  FRESULT res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
+  if (res == FR_OK) {
+    f_lseek(&fp, offset);
+    res = f_read(&fp, pBuffer, num_bytes, &bytes_read);
+    f_close(&fp);
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+void create_xbf_font (void) {
+  GUI_XBF_CreateFont(&ChineseFont_36, 
+                     &ChineseFont_36_XBF, 
+                     GUI_XBF_TYPE_PROP_AA2_EXT, 
+                     _cb_Font_XBF_GetData, 
+                     (void*)chinese_font_36_addr);
+}
+
 // USER END
 
 /*********************************************************************
@@ -149,34 +186,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
   switch (pMsg->MsgId) {
   case WM_INIT_DIALOG:
     //
-    // Initialization of 'Time: '
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    TEXT_SetFont(hItem, GUI_FONT_20_1);
-    //
-    // Initialization of 'Date: '
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
-    TEXT_SetFont(hItem, GUI_FONT_20_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
-    //
     // Initialization of '00:00:00'
     //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     //
     // Initialization of '0000/00/00'
     //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
     //
     // Initialization of 'WeekDay'
     //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
-    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_20_1);
     //
     // Initialization of 'Settings'
@@ -187,6 +212,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
     WM_CreateTimer(pMsg->hWin, 0, 1000, 0);
     update_date(pMsg);
+
+    // hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+    // BUTTON_SetText(hItem, settings);
+    // BUTTON_SetFont(hItem, &ChineseFont_36);
 
     // USER END
     break;
