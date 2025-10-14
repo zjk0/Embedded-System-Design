@@ -32,6 +32,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "ffconf.h"
+#include "ff.h"
+#include "ff_gen_drv.h"
+#include "diskio.h"
+#include "integer.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -121,6 +127,8 @@ int main(void)
   MX_FATFS_Init();
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
+
+  BSP_SD_Init();
 
   /* USER CODE END 2 */
 

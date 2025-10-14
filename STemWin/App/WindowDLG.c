@@ -88,7 +88,7 @@ extern int is_alarm (void);
 extern int enable_alarm;
 
 static const char root_dir[] = "";  // The root dir of TF card
-static const char chinese_font_36_addr[] = "Font/ChineseFont.xbf";
+static const char chinese_font_36_addr[] = "Font/ChineseFont36.xbf";
 GUI_XBF_DATA ChineseFont_36_XBF;
 GUI_FONT ChineseFont_36;
 extern const char* settings;
@@ -145,12 +145,14 @@ void update_date (WM_MESSAGE * pMsg) {
 }
 
 static int _cb_Font_XBF_GetData (U32 offset, U16 num_bytes, void* pVoid, void* pBuffer) {
+  FRESULT res;
+
   if (fatfs_init_flag == 0) {
-    f_mount(&fs, (const TCHAR*)root_dir, 1);
+    res = f_mount(&fs, (const TCHAR*)root_dir, 1);
     fatfs_init_flag = 1;
   }
 
-  FRESULT res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
+  res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
   if (res == FR_OK) {
     f_lseek(&fp, offset);
     res = f_read(&fp, pBuffer, num_bytes, &bytes_read);

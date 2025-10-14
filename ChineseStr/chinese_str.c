@@ -1,1 +1,1 @@
-ï»¿const char* settings = "æ—¶é—´ï¼š";
+const char* settings = "ÉèÖÃ";
