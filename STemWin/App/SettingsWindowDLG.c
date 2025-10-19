@@ -32,11 +32,12 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0             (GUI_ID_USER + 0x00)
-#define ID_BUTTON_0             (GUI_ID_USER + 0x01)
-#define ID_BUTTON_1             (GUI_ID_USER + 0x02)
-#define ID_BUTTON_2             (GUI_ID_USER + 0x03)
-#define ID_BUTTON_3             (GUI_ID_USER + 0x04)
+#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
+#define ID_BUTTON_0     (GUI_ID_USER + 0x01)
+#define ID_BUTTON_1     (GUI_ID_USER + 0x02)
+#define ID_BUTTON_2     (GUI_ID_USER + 0x03)
+#define ID_BUTTON_3     (GUI_ID_USER + 0x04)
+#define ID_BUTTON_4     (GUI_ID_USER + 0x05)
 
 
 // USER START (Optionally insert additional defines)
@@ -62,6 +63,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { BUTTON_CreateIndirect, "set alarm", ID_BUTTON_1, 120, 10, 100, 50, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Quit", ID_BUTTON_2, 375, 10, 100, 50, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "wave signal", ID_BUTTON_3, 10, 70, 120, 50, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "midi music", ID_BUTTON_4, 10, 130, 120, 50, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -78,6 +80,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 extern WM_HWIN CreateSetTimeWindow(void);
 extern WM_HWIN CreateSetAlarmWindow(void);
 extern WM_HWIN CreateWaveSignalWindow(void);
+extern WM_HWIN CreateMidiWindow(void);
 extern WM_HWIN CreateWindow(void);
 
 // USER END
@@ -114,6 +117,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     // Initialization of 'wave signal'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'midi music'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_4);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
     // USER END
@@ -177,6 +185,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         // USER START (Optionally insert code for reacting on notification message)
         WM_DeleteWindow(pMsg->hWin);
         CreateWaveSignalWindow();
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_4: // Notifications sent by 'midi music'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        WM_DeleteWindow(pMsg->hWin);
+        CreateMidiWindow();
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:

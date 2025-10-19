@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --backend -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
+& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --backend -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
 }
 else
 {
-& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --debug_file=$debugfile --backend -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
+& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --debug_file=$debugfile --backend -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
 }

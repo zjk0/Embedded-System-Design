@@ -21,7 +21,8 @@
 // USER START (Optionally insert additional includes)
 
 #include "main.h"
-#include "adc.h"
+#include "stm32746g_discovery_audio.h"
+#include "string.h"
 
 // USER END
 
@@ -42,6 +43,7 @@
 
 #define TIME_DOMAIN 0
 #define FREQUENCE_DOMAIN 1
+#define BUFFER_SIZE 256
 
 // USER END
 
@@ -76,27 +78,26 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
-uint8_t is_adc_ok = 0;
-WM_HWIN hTimeDomainGraph;
+static int16_t signal_input[BUFFER_SIZE];
+int16_t wave_signal[BUFFER_SIZE];
+uint8_t is_transfer_ok = 0;
+WM_HWIN hGraph = 0;
+GRAPH_DATA_Handle hData;
+GRAPH_SCALE_Handle hScaleY;
 
 extern WM_HWIN CreateWaveSignalWindow(void);
 
 extern uint8_t domain;
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-  if (hadc->Instance == ADC3) {
-    is_adc_ok = 1;
+void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
+  is_transfer_ok = 1;
+  memcpy(wave_signal, signal_input, BUFFER_SIZE);
+  GRAPH_DATA_YT_Clear(hData);
+  for (int i = 0; i < BUFFER_SIZE; i++) {
+    GRAPH_DATA_YT_AddValue(hData, wave_signal[i] / 50 + 100);
   }
+  WM_InvalidateWindow(hGraph);
 }
-
-// void update_time_domain_graph (WM_HWIN hGraph) {
-//   if (is_adc_ok) {
-//     GRAPH_DATA_Handle hData = GRAPH_DATA_YT_Create(GUI_DARKGREEN, ADC_BUFFER_SIZE + 1, adc_buffer, ADC_BUFFER_SIZE);
-//     GRAPH_AttachData(hGraph, hData);
-//     GRAPH_DATA_YT_Delete(hData);
-//     is_adc_ok = 0;
-//   }
-// }
 
 // USER END
 
@@ -120,10 +121,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
-    hTimeDomainGraph = hItem;
-
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_GRAPH_0);
-    GRAPH_SetGridVis(hItem, 1);  // Grid is visual
+    hGraph = WM_GetDialogItem(pMsg->hWin, ID_GRAPH_0);
+    GRAPH_SetGridVis(hGraph, 1);  // Grid is visual
+    GRAPH_SetGridFixedX(hGraph, 1);
+    GRAPH_SetGridDistY(hGraph, 25);
+    hData = GRAPH_DATA_YT_Create(GUI_DARKGREEN, BUFFER_SIZE, wave_signal, 0);
+    GRAPH_AttachData(hGraph, hData);
 
     // if (domain == TIME_DOMAIN) {
 
@@ -132,8 +135,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
     // }
 
-    is_adc_ok = 0;
-    HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adc_buffer, ADC_BUFFER_SIZE);
+    is_transfer_ok = 0;
+    BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_16K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
+    BSP_AUDIO_IN_Record((uint16_t*)signal_input, BUFFER_SIZE);
+
+    // WM_EnableMemdev(hGraph);
 
     // USER END
     break;
@@ -145,7 +151,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
-        HAL_ADC_Stop_DMA(&hadc3);
+        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
+        // WM_DisableMemdev(hGraph);
         WM_DeleteWindow(pMsg->hWin);
         CreateWaveSignalWindow();
         // USER END

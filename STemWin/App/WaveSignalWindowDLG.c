@@ -21,7 +21,6 @@
 // USER START (Optionally insert additional includes)
 
 #include "main.h"
-#include "adc.h"
 
 // USER END
 
@@ -82,7 +81,6 @@ extern WM_HWIN CreateWindow(void);
 extern WM_HWIN CreateShowWaveSignalWindow(void);
 
 uint8_t domain;
-uint16_t adc_buffer[ADC_BUFFER_SIZE];
 
 // USER END
 
@@ -126,7 +124,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
         domain = TIME_DOMAIN;
-        // HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adc_buffer, ADC_BUFFER_SIZE);
         WM_DeleteWindow(pMsg->hWin);
         CreateShowWaveSignalWindow();
         // USER END

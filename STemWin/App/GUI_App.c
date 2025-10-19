@@ -58,14 +58,16 @@ void GRAPHICS_MainTask(void) {
 
   extern void checkTouch (void);
   extern void create_xbf_font (void);
+  extern int free_bytes;
 
-  GUI_UC_SetEncodeUTF8();
-  create_xbf_font();
+  // GUI_UC_SetEncodeUTF8();
+  // create_xbf_font();
 
   while(1)
   {
     GUI_Delay(100);
     checkTouch();
+    free_bytes = GUI_ALLOC_GetNumFreeBytes();
   }
 
 /* USER CODE END GRAPHICS_MainTask */

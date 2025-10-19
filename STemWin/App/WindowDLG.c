@@ -27,6 +27,7 @@
 #include "ff.h"
 #include "ff_gen_drv.h"
 #include "diskio.h"
+#include "string.h"
 
 // USER END
 
@@ -38,11 +39,11 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
-#define ID_TEXT_0     (GUI_ID_USER + 0x03)
-#define ID_TEXT_1     (GUI_ID_USER + 0x04)
-#define ID_TEXT_2     (GUI_ID_USER + 0x05)
-#define ID_BUTTON_0     (GUI_ID_USER + 0x06)
+#define ID_WINDOW_0             (GUI_ID_USER + 0x00)
+#define ID_TEXT_0             (GUI_ID_USER + 0x01)
+#define ID_TEXT_1             (GUI_ID_USER + 0x02)
+#define ID_TEXT_2             (GUI_ID_USER + 0x03)
+#define ID_BUTTON_0             (GUI_ID_USER + 0x04)
 
 
 // USER START (Optionally insert additional defines)
@@ -87,16 +88,23 @@ extern int is_alarm (void);
 
 extern int enable_alarm;
 
-static const char root_dir[] = "";  // The root dir of TF card
-static const char chinese_font_36_addr[] = "Font/ChineseFont36.xbf";
-GUI_XBF_DATA ChineseFont_36_XBF;
-GUI_FONT ChineseFont_36;
-extern const char* settings;
+// static const char root_dir[] = "";  // The root dir of TF card
+// static const char chinese_font_36_addr[] = "Font/ChineseFont36.xbf";
+// static const char chinese_font_20_addr[] = "Font/ChineseFont20.xbf";
+// GUI_XBF_DATA ChineseFont_36_XBF;
+// GUI_FONT ChineseFont_36;
+// GUI_XBF_DATA ChineseFont_20_XBF;
+// GUI_FONT ChineseFont_20;
+// extern const char* settings;
 
-uint8_t fatfs_init_flag = 0;
-FATFS fs;
-FIL fp;
-UINT bytes_read;
+// // fatfs
+// uint8_t fatfs_init_flag = 0;
+// FATFS fs;
+// FIL fp;
+// UINT bytes_read;
+
+// char files[20][50];
+// uint8_t count;
 
 void update_date (WM_MESSAGE * pMsg) {
   WM_HWIN time_item = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
@@ -144,33 +152,33 @@ void update_date (WM_MESSAGE * pMsg) {
   TEXT_SetText(weekday_item, weekday_str);
 }
 
-static int _cb_Font_XBF_GetData (U32 offset, U16 num_bytes, void* pVoid, void* pBuffer) {
-  FRESULT res;
+// static int _cb_Font_XBF_GetData (U32 offset, U16 num_bytes, void* pVoid, void* pBuffer) {
+//   FRESULT res;
 
-  if (fatfs_init_flag == 0) {
-    res = f_mount(&fs, (const TCHAR*)root_dir, 1);
-    fatfs_init_flag = 1;
-  }
+//   if (fatfs_init_flag == 0) {
+//     res = f_mount(&fs, (const TCHAR*)root_dir, 1);
+//     fatfs_init_flag = 1;
+//   }
 
-  res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
-  if (res == FR_OK) {
-    f_lseek(&fp, offset);
-    res = f_read(&fp, pBuffer, num_bytes, &bytes_read);
-    f_close(&fp);
-    return 1;
-  }
-  else {
-    return 0;
-  }
-}
+//   res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
+//   if (res == FR_OK) {
+//     f_lseek(&fp, offset);
+//     res = f_read(&fp, pBuffer, num_bytes, &bytes_read);
+//     f_close(&fp);
+//     return 1;
+//   }
+//   else {
+//     return 0;
+//   }
+// }
 
-void create_xbf_font (void) {
-  GUI_XBF_CreateFont(&ChineseFont_36, 
-                     &ChineseFont_36_XBF, 
-                     GUI_XBF_TYPE_PROP_AA2_EXT, 
-                     _cb_Font_XBF_GetData, 
-                     (void*)chinese_font_36_addr);
-}
+// void create_xbf_font (void) {
+//   GUI_XBF_CreateFont(&ChineseFont_20, 
+//                      &ChineseFont_20_XBF, 
+//                      GUI_XBF_TYPE_PROP_AA2_EXT, 
+//                      _cb_Font_XBF_GetData, 
+//                      (void*)chinese_font_20_addr);
+// }
 
 // USER END
 
@@ -217,7 +225,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
     // hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
     // BUTTON_SetText(hItem, settings);
-    // BUTTON_SetFont(hItem, &ChineseFont_36);
+    // BUTTON_SetFont(hItem, &ChineseFont_20);
 
     // USER END
     break;

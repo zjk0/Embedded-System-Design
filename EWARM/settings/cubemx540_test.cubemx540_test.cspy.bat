@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --backend -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
+"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" --backend -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" "--debug_file=%~1" --backend -f "F:\none\Study\Electron\Embedded-System-Design\cubemx540_test\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
+"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.general.xcl" "--debug_file=%~1" --backend -f "F:\none\Study\Electron\Embedded-System-Design\design\EWARM\settings\cubemx540_test.cubemx540_test.driver.xcl" 
 
 @echo off 
 :end

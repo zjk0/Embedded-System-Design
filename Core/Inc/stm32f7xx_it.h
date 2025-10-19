@@ -60,7 +60,12 @@ void ADC_IRQHandler(void);
 void SDMMC1_IRQHandler(void);
 void DMA2_Stream0_IRQHandler(void);
 void DMA2_Stream3_IRQHandler(void);
+void DMA2_Stream4_IRQHandler(void);
+void OTG_FS_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
+void DMA2_Stream7_IRQHandler(void);
+void I2C3_EV_IRQHandler(void);
+void SAI2_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
