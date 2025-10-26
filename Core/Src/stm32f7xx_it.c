@@ -72,6 +72,7 @@ extern SAI_HandleTypeDef hsai_BlockB2;
 extern DMA_HandleTypeDef hdma_sdmmc1_rx;
 extern DMA_HandleTypeDef hdma_sdmmc1_tx;
 extern SD_HandleTypeDef hsd1;
+extern TIM_HandleTypeDef htim12;
 extern void GRAPHICS_IncTick(void);
 
 /* USER CODE BEGIN EV */
@@ -106,7 +107,7 @@ void HardFault_Handler(void)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
 
-    free_bytes = GUI_ALLOC_GetNumFreeBytes();
+    // free_bytes = GUI_ALLOC_GetNumFreeBytes();
 
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
@@ -230,6 +231,20 @@ void ADC_IRQHandler(void)
   /* USER CODE BEGIN ADC_IRQn 1 */
 
   /* USER CODE END ADC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM8 break interrupt and TIM12 global interrupt.
+  */
+void TIM8_BRK_TIM12_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM8_BRK_TIM12_IRQn 0 */
+
+  /* USER CODE END TIM8_BRK_TIM12_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim12);
+  /* USER CODE BEGIN TIM8_BRK_TIM12_IRQn 1 */
+
+  /* USER CODE END TIM8_BRK_TIM12_IRQn 1 */
 }
 
 /**

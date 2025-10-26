@@ -21,12 +21,12 @@
 // USER START (Optionally insert additional includes)
 
 #include "main.h"
-#include "ffconf.h"
-#include "ff.h"
-#include "ff_gen_drv.h"
-#include "diskio.h"
 #include "string.h"
 #include "stdio.h"
+#include "fatfs.h"
+#include "midi.h"
+#include "tim.h"
+#include "math.h"
 
 // USER END
 
@@ -40,11 +40,16 @@
 */
 #define ID_WINDOW_0     (GUI_ID_USER + 0x00)
 #define ID_BUTTON_0     (GUI_ID_USER + 0x01)
-#define ID_LISTVIEW_0     (GUI_ID_USER + 0x02)
-#define ID_BUTTON_1     (GUI_ID_USER + 0x03)
+#define ID_BUTTON_1     (GUI_ID_USER + 0x02)
+#define ID_BUTTON_2     (GUI_ID_USER + 0x03)
+#define ID_BUTTON_3     (GUI_ID_USER + 0x04)
+#define ID_DROPDOWN_0     (GUI_ID_USER + 0x05)
 
 
 // USER START (Optionally insert additional defines)
+
+#define TIMER_CLOCK_FREQ 216000000.0f
+
 // USER END
 
 /*********************************************************************
@@ -63,9 +68,11 @@
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { WINDOW_CreateIndirect, "MidiWindow", ID_WINDOW_0, 0, 0, 480, 272, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Play", ID_BUTTON_0, 375, 10, 100, 50, 0, 0x0, 0 },
-  { LISTVIEW_CreateIndirect, "Listview", ID_LISTVIEW_0, 93, 55, 90, 60, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Play", ID_BUTTON_0, 265, 10, 100, 50, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Quit", ID_BUTTON_1, 375, 70, 100, 50, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Stop", ID_BUTTON_2, 265, 70, 100, 50, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Refresh", ID_BUTTON_3, 375, 10, 100, 50, 0, 0x0, 0 },
+  { DROPDOWN_CreateIndirect, "Dropdown", ID_DROPDOWN_0, 10, 10, 130, 18, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -81,16 +88,16 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 extern WM_HWIN CreateWindow(void);
 
-static const char root_dir[] = "";  // The root dir of TF card
+extern char root_dir[];  // The root dir of TF card
+char midi_folder[] = "midi/";
 
 // fatfs
-uint8_t fatfs_init_flag = 0;
-FATFS fs;
-FIL fp;
-UINT bytes_read;
+extern UINT bytes_read;
+uint8_t* midi_buffer;
+uint32_t tempo = 500000;
 
 char* midi_files[20];
-uint8_t count;
+uint8_t midi_num;  // The number of midi files
 
 FRESULT ScanMidiFiles (char* files[], uint8_t* count) {
   FRESULT res;
@@ -114,6 +121,9 @@ FRESULT ScanMidiFiles (char* files[], uint8_t* count) {
     if (ext && (strcmp(ext, ".mid") == 0 || strcmp(ext, ".midi") == 0)) {
       len = strlen(f_info.fname);
       if (*count < 10) {
+        if (files[*count] != NULL) {
+          free(files[*count]);
+        }
         files[*count] = malloc(sizeof(char) * (len + 1));
         strcpy(files[*count], f_info.fname);
         (*count)++;
@@ -123,6 +133,165 @@ FRESULT ScanMidiFiles (char* files[], uint8_t* count) {
 
   f_closedir(&dir);
   return FR_OK;
+}
+
+char* merge_str (char* str1, char* str2) {
+  int len1 = strlen(str1);
+  int len2 = strlen(str2);
+  char* result = malloc(sizeof(char) * (len1 + len2 + 1));
+
+  strcpy(result, str1);
+  strcat(result, str2);
+
+  return result;
+}
+
+void play_buzzer (uint8_t note_num, uint8_t velocity) {
+  float frequency = 440.0 * pow(2, (note_num - 69) / 12.0); 
+  float period = 1.0 / frequency;
+  float timer_count = TIMER_CLOCK_FREQ * period;
+  uint32_t psc;
+  uint32_t arr;
+
+  if (timer_count > 65535) {
+    psc = (uint32_t)(timer_count / 65535) + 1;
+    arr = (uint32_t)(timer_count / psc) - 1;
+  }
+  else {
+    psc = 0;
+    arr = (uint32_t)(timer_count - 1);
+  }
+
+  if (arr < 1) {
+    arr = 1;
+  }
+  if (arr > 65535) {
+    arr = 65535;
+  }
+  if (psc > 65535) {
+    psc = 65535;
+  }
+
+  HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
+
+  __HAL_TIM_SET_PRESCALER(&htim12, psc);
+  __HAL_TIM_SET_AUTORELOAD(&htim12, arr);
+  
+  uint32_t duty = arr * velocity / 128;
+  __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_1, duty);
+
+  HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
+}
+
+void stop_buzzer (void) {
+  HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
+}
+
+int play_midi (char* midi_path) {
+  FRESULT res;
+
+  // Open midi file
+  res = f_open(&SDFile, (const TCHAR*)midi_path, FA_READ);
+  if (res != FR_OK) {
+    return MIDI_ERROR;
+  }
+
+  // Decode the header of midi file
+  midi_buffer = malloc(14);
+  res = f_read(&SDFile, midi_buffer, 14, &bytes_read);
+  if (res != FR_OK || bytes_read != 14) {
+    return MIDI_ERROR;
+  }
+  if (midi_decode_header(&midi_info, midi_buffer) != MIDI_OK) {
+    return MIDI_ERROR;
+  }
+
+  // Decode the tracks of midi file
+  for (int i = 0; i < midi_info.header.num_tracks; i++) {
+    // Decode the header of track
+    free(midi_buffer);
+    midi_buffer = malloc(8);
+    res = f_read(&SDFile, midi_buffer, 8, &bytes_read);
+    if (res != FR_OK || bytes_read != 8) {
+      return MIDI_ERROR;
+    }
+    if (midi_decode_track_header(&midi_info, midi_buffer) != MIDI_OK) {
+      return MIDI_ERROR;
+    }
+
+    // Decode the events of track
+    free(midi_buffer);
+    midi_buffer = malloc(midi_info.track.size);
+    midi_info.track.last_status = 0;
+    res = f_read(&SDFile, midi_buffer, midi_info.track.size, &bytes_read);
+    if (res != FR_OK || bytes_read != midi_info.track.size) {
+      return MIDI_ERROR;
+    }
+
+    uint32_t offset = 0;  // Note where the position is
+    uint8_t event_type;
+    uint8_t channel;
+
+
+    while (1) {
+      midi_info.track.event.delta_time = get_variable_value(midi_buffer, &offset);
+
+      midi_info.track.event.status = midi_buffer[offset];
+      offset++;
+
+      if (midi_info.track.event.status < CHANNEL_EVENT_DOWN) {
+        midi_info.track.event.status = midi_info.track.last_status;
+        offset--;
+      }
+      else {
+        midi_info.track.last_status = midi_info.track.event.status;
+      }
+
+      if (midi_info.track.event.status == META_EVENT_TYPE) {
+        uint8_t meta_type = midi_buffer[offset];
+        offset++;
+        uint32_t meta_len = get_variable_value(midi_buffer, &offset);
+        if (meta_type == META_END_OF_TRACK && meta_len == 0) {
+          break;
+        }
+        else if (meta_type == META_SET_TEMPO) {
+          tempo = (midi_buffer[offset] << 16) | (midi_buffer[offset + 1] << 8) | (midi_buffer[offset + 2]);
+          offset += 3;
+        }
+        else {
+          offset += meta_len;
+        }
+      }
+      else if (midi_info.track.event.status >= CHANNEL_EVENT_DOWN && midi_info.track.event.status <= CHANNEL_EVENT_UP) {
+        event_type = midi_info.track.event.status & 0xF0;
+        channel = midi_info.track.event.status & 0x0F;
+
+        if (event_type == NOTE_OFF) {
+          midi_info.track.event.param1 = midi_buffer[offset++];  // note number
+          midi_info.track.event.param2 = midi_buffer[offset++];  // velocity
+          stop_buzzer();
+        }
+        else if (event_type == NOTE_ON) {
+          midi_info.track.event.param1 = midi_buffer[offset++];  // note number
+          midi_info.track.event.param2 = midi_buffer[offset++];  // velocity
+
+          if (midi_info.track.event.param2 > 0) {
+            play_buzzer(midi_info.track.event.param1, midi_info.track.event.param2);
+          }
+          else {
+            stop_buzzer();
+          }
+        }
+      }
+
+      uint32_t real_time = midi_info.track.event.delta_time * tempo / midi_info.header.time_division;
+      real_time /= 1000;
+      HAL_Delay(real_time);
+    }
+  }
+
+  f_close(&SDFile);
+  return MIDI_OK;
 }
 
 // USER END
@@ -146,31 +315,30 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
     //
-    // Initialization of 'Listview'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTVIEW_0);
-    LISTVIEW_AddColumn(hItem, 30, "Col 0", GUI_TA_HCENTER | GUI_TA_VCENTER);
-    LISTVIEW_AddColumn(hItem, 30, "Col 1", GUI_TA_HCENTER | GUI_TA_VCENTER);
-    LISTVIEW_AddColumn(hItem, 30, "Col 2", GUI_TA_HCENTER | GUI_TA_VCENTER);
-    LISTVIEW_AddRow(hItem, NULL);
-    LISTVIEW_SetGridVis(hItem, 1);
-    //
     // Initialization of 'Quit'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Stop'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Refresh'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
-    if (fatfs_init_flag == 0) {
-      FRESULT res;
-      res = f_mount(&fs, (const TCHAR*)root_dir, 1);
-      fatfs_init_flag = 1;
-      ScanMidiFiles(midi_files, &count);
+    ScanMidiFiles(midi_files, &midi_num);
+
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
+    DROPDOWN_SetAutoScroll(hItem, 1);
+    DROPDOWN_SetListHeight(hItem, 100);
+    for (int i = 0; i < midi_num; i++) {
+      DROPDOWN_AddString(hItem, midi_files[i]);
     }
-
-    
-
-    // ScanMidiFiles(midi_files, &count);
 
     // USER END
     break;
@@ -182,27 +350,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
+        char* midi_path;
+        int index;
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
+        index = DROPDOWN_GetSel(hItem);
+        midi_path = merge_str(midi_folder, midi_files[index]);
+        // f_open(&SDFile, (const TCHAR*)midi_path, FA_READ);
+        // while (f_read(&SDFile, &midi_data, 1, &bytes_read) == FR_OK && bytes_read == 1) {
+        //   printf("%X\n", midi_data);
+        // }
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_LISTVIEW_0: // Notifications sent by 'Listview'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
         // USER END
         break;
@@ -219,6 +378,60 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_2: // Notifications sent by 'Stop'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_3: // Notifications sent by 'Refresh'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
+        for (int i = 0; i < midi_num; i++) {
+          DROPDOWN_DeleteItem(hItem, 0);
+        }
+        ScanMidiFiles(midi_files, &midi_num);
+        for (int i = 0; i < midi_num; i++) {
+          DROPDOWN_AddString(hItem, midi_files[i]);
+        }
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_DROPDOWN_0: // Notifications sent by 'Dropdown'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
         // USER END
         break;

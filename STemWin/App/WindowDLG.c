@@ -23,11 +23,8 @@
 #include "main.h"
 #include "rtc.h"
 #include "stdio.h"
-#include "ffconf.h"
-#include "ff.h"
-#include "ff_gen_drv.h"
-#include "diskio.h"
 #include "string.h"
+#include "fatfs.h"
 
 // USER END
 
@@ -88,20 +85,9 @@ extern int is_alarm (void);
 
 extern int enable_alarm;
 
-// static const char root_dir[] = "";  // The root dir of TF card
-// static const char chinese_font_36_addr[] = "Font/ChineseFont36.xbf";
-// static const char chinese_font_20_addr[] = "Font/ChineseFont20.xbf";
-// GUI_XBF_DATA ChineseFont_36_XBF;
-// GUI_FONT ChineseFont_36;
-// GUI_XBF_DATA ChineseFont_20_XBF;
-// GUI_FONT ChineseFont_20;
-// extern const char* settings;
-
-// // fatfs
-// uint8_t fatfs_init_flag = 0;
-// FATFS fs;
-// FIL fp;
-// UINT bytes_read;
+uint8_t fatfs_init_flag = 0;
+char root_dir[] = "";  // The root dir of TF card
+UINT bytes_read;
 
 // char files[20][50];
 // uint8_t count;
@@ -152,34 +138,6 @@ void update_date (WM_MESSAGE * pMsg) {
   TEXT_SetText(weekday_item, weekday_str);
 }
 
-// static int _cb_Font_XBF_GetData (U32 offset, U16 num_bytes, void* pVoid, void* pBuffer) {
-//   FRESULT res;
-
-//   if (fatfs_init_flag == 0) {
-//     res = f_mount(&fs, (const TCHAR*)root_dir, 1);
-//     fatfs_init_flag = 1;
-//   }
-
-//   res = f_open(&fp, (const TCHAR*)pVoid, FA_OPEN_EXISTING | FA_READ);
-//   if (res == FR_OK) {
-//     f_lseek(&fp, offset);
-//     res = f_read(&fp, pBuffer, num_bytes, &bytes_read);
-//     f_close(&fp);
-//     return 1;
-//   }
-//   else {
-//     return 0;
-//   }
-// }
-
-// void create_xbf_font (void) {
-//   GUI_XBF_CreateFont(&ChineseFont_20, 
-//                      &ChineseFont_20_XBF, 
-//                      GUI_XBF_TYPE_PROP_AA2_EXT, 
-//                      _cb_Font_XBF_GetData, 
-//                      (void*)chinese_font_20_addr);
-// }
-
 // USER END
 
 /*********************************************************************
@@ -223,9 +181,19 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     WM_CreateTimer(pMsg->hWin, 0, 1000, 0);
     update_date(pMsg);
 
+    if (fatfs_init_flag == 0) {
+      FRESULT res;
+      res = f_mount(&SDFatFS, (const TCHAR*)root_dir, 1);
+      if (res == FR_OK) {
+        fatfs_init_flag = 1;
+      }
+    }
+
+    // GUI_UC_SetEncodeUTF8();
+    // create_xbf_font();
     // hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
-    // BUTTON_SetText(hItem, settings);
     // BUTTON_SetFont(hItem, &ChineseFont_20);
+    // BUTTON_SetText(hItem, settings);
 
     // USER END
     break;

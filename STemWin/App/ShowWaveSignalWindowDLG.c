@@ -23,6 +23,10 @@
 #include "main.h"
 #include "stm32746g_discovery_audio.h"
 #include "string.h"
+#include "stdio.h"
+
+#include "arm_math.h"
+#include "arm_const_structs.h"
 
 // USER END
 
@@ -34,16 +38,19 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0     (GUI_ID_USER + 0x07)
-#define ID_GRAPH_0     (GUI_ID_USER + 0x08)
-#define ID_BUTTON_0     (GUI_ID_USER + 0x09)
+#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
+#define ID_GRAPH_0     (GUI_ID_USER + 0x01)
+#define ID_BUTTON_0     (GUI_ID_USER + 0x02)
+#define ID_TEXT_0     (GUI_ID_USER + 0x03)
 
 
 // USER START (Optionally insert additional defines)
 
 #define TIME_DOMAIN 0
 #define FREQUENCE_DOMAIN 1
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 512
+#define FFT_LEN 512
+#define SAMPLE_RATE 44100.0f
 
 // USER END
 
@@ -65,6 +72,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { WINDOW_CreateIndirect, "ShowWaveSignalWindow", ID_WINDOW_0, 0, 0, 480, 272, 0, 0x0, 0 },
   { GRAPH_CreateIndirect, "Graph", ID_GRAPH_0, 20, 10, 440, 200, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Quit", ID_BUTTON_0, 190, 215, 100, 50, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "peak_fre", ID_TEXT_0, 20, 228, 80, 20, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -81,9 +89,18 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 static int16_t signal_input[BUFFER_SIZE];
 int16_t wave_signal[BUFFER_SIZE];
 uint8_t is_transfer_ok = 0;
+
 WM_HWIN hGraph = 0;
 GRAPH_DATA_Handle hData;
 GRAPH_SCALE_Handle hScaleY;
+
+arm_rfft_fast_instance_f32 fft_instance;
+uint8_t is_fft_init = 0;
+float32_t fft_input[FFT_LEN];
+float32_t fft_output[FFT_LEN];
+float32_t fft_output_mag[FFT_LEN];
+float max_fre = 0;
+float max_fre_mag = 0;
 
 extern WM_HWIN CreateWaveSignalWindow(void);
 
@@ -91,12 +108,15 @@ extern uint8_t domain;
 
 void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
   is_transfer_ok = 1;
-  memcpy(wave_signal, signal_input, BUFFER_SIZE);
-  GRAPH_DATA_YT_Clear(hData);
-  for (int i = 0; i < BUFFER_SIZE; i++) {
-    GRAPH_DATA_YT_AddValue(hData, wave_signal[i] / 50 + 100);
+  memcpy(wave_signal, signal_input, BUFFER_SIZE * sizeof(uint16_t));
+}
+
+void fft_app (void) {
+  for (int i = 0; i < FFT_LEN; i++) {
+    fft_input[i] = (float32_t)(wave_signal[i] * 1.0);
   }
-  WM_InvalidateWindow(hGraph);
+  arm_rfft_fast_f32(&fft_instance, fft_input, fft_output, 0);
+  arm_cmplx_mag_f32(fft_output, fft_output_mag, FFT_LEN);
 }
 
 // USER END
@@ -119,25 +139,37 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
     BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'peak_fre'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
+    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    TEXT_SetFont(hItem, GUI_FONT_16_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
     hGraph = WM_GetDialogItem(pMsg->hWin, ID_GRAPH_0);
     GRAPH_SetGridVis(hGraph, 1);  // Grid is visual
-    GRAPH_SetGridFixedX(hGraph, 1);
-    GRAPH_SetGridDistY(hGraph, 25);
-    hData = GRAPH_DATA_YT_Create(GUI_DARKGREEN, BUFFER_SIZE, wave_signal, 0);
-    GRAPH_AttachData(hGraph, hData);
 
-    // if (domain == TIME_DOMAIN) {
-
-    // }
-    // else if (domain == FREQUENCE_DOMAIN) {
-
-    // }
+    if (domain == TIME_DOMAIN) {
+      GRAPH_SetVSizeX(hGraph, BUFFER_SIZE);
+      GRAPH_SetGridDistY(hGraph, 25);
+      hData = GRAPH_DATA_YT_Create(GUI_DARKGREEN, BUFFER_SIZE, wave_signal, 0);
+      GRAPH_AttachData(hGraph, hData);
+    }
+    else if (domain == FREQUENCE_DOMAIN) {
+      if (!is_fft_init) {
+        arm_rfft_fast_init_f32(&fft_instance, FFT_LEN);
+        is_fft_init = 1;
+      }
+      hData = GRAPH_DATA_YT_Create(GUI_DARKGREEN, FFT_LEN, (int16_t*)fft_output_mag, 0);
+      GRAPH_AttachData(hGraph, hData);
+    }
 
     is_transfer_ok = 0;
     BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_16K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
     BSP_AUDIO_IN_Record((uint16_t*)signal_input, BUFFER_SIZE);
+
+    WM_CreateTimer(pMsg->hWin, 0, 100, 0);
 
     // WM_EnableMemdev(hGraph);
 
@@ -170,6 +202,37 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     }
     break;
   // USER START (Optionally insert additional message handling)
+  case WM_TIMER:
+    if (is_transfer_ok) {
+      max_fre = 0;
+      max_fre_mag = 0;
+      GRAPH_DATA_YT_Clear(hData);
+      if (domain == TIME_DOMAIN) {
+        for (int i = 0; i < BUFFER_SIZE; i++) {
+          GRAPH_DATA_YT_AddValue(hData, wave_signal[i] / 50 + 100);
+        }
+      }
+      else if (domain == FREQUENCE_DOMAIN) {
+        fft_app();
+
+        for (int i = 0; i < FFT_LEN / 2; i++) {
+          GRAPH_DATA_YT_AddValue(hData, fft_output_mag[i] / FFT_LEN);
+          if (fft_output_mag[i] > max_fre_mag) {
+            max_fre_mag = fft_output_mag[i];
+            max_fre = i;
+          }
+        }
+
+        max_fre = max_fre * (SAMPLE_RATE / FFT_LEN);
+        char peak_fre[15];
+        sprintf(peak_fre, "%.1f Hz", max_fre);
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
+        TEXT_SetText(hItem, peak_fre);
+      }
+      WM_InvalidateWindow(hGraph);
+    }
+
+    WM_RestartTimer(pMsg->Data.v, 100);
   // USER END
   default:
     WM_DefaultProc(pMsg);

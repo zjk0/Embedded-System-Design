@@ -3,11 +3,11 @@ F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\adc.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\AlarmWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\bsp_driver_sd.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\cc936.pbi
-F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\chinese_str.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\crc.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\diskio.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\dma.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\fatfs.pbi
+F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\fatfs_platform.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\ff.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\ff_gen_drv.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\gpio.pbi
@@ -17,6 +17,7 @@ F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\GUIConf.pb
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\HW_Init.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\i2c.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\main.pbi
+F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\midi.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\MidiWindowDLG.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\rtc.pbi
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM\design\Obj\sai.pbi

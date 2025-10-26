@@ -35,6 +35,8 @@ F:\none\Study\Electron\Embedded-System-Design\design\EWARM/../Middlewares/ST/STM
 -I
 F:\none\Study\Electron\Embedded-System-Design\design\EWARM/../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc
 -I
+F:\none\Study\Electron\Embedded-System-Design\design\EWARM\..\Drivers\CMSIS\DSP\Include
+-I
 F:\EWARM_8321\arm\inc
 -I
 F:\EWARM_8321\arm\inc\c
@@ -68,6 +70,8 @@ F:\none\Study\Electron\Embedded-System-Design\design\USB_DEVICE\Target
 F:\none\Study\Electron\Embedded-System-Design\design\Middlewares\ST\STM32_USB_Device_Library\Core\Inc
 -I
 F:\none\Study\Electron\Embedded-System-Design\design\Middlewares\ST\STM32_USB_Device_Library\Class\MSC\Inc
+-I
+F:\none\Study\Electron\Embedded-System-Design\design\Drivers\CMSIS\DSP\Include
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0
@@ -364,6 +368,7 @@ F:\none\Study\Electron\Embedded-System-Design\design\Middlewares\ST\STM32_USB_De
 -D__EDG_FLOAT128_ENABLING_POSSIBLE=0
 -DUSE_HAL_DRIVER=1
 -DSTM32F746xx=1
+-DARM_MATH_CM7=1
 -D_DLIB_CONFIG_FILE_HEADER_NAME="F:\\EWARM_8321\\arm\\inc\\c\\DLib_Config_Full.h"
 -D_DLIB_CONFIG_FILE_STRING="F:\\EWARM_8321\\arm\\inc\\c\\DLib_Config_Full.h"
 -D__VERSION__="IAR ANSI C/C++ Compiler V8.32.1.169/W32 for ARM"

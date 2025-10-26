@@ -34,16 +34,18 @@
 *
 **********************************************************************
 */
-#define ID_WINDOW_0     (GUI_ID_USER + 0x15)
-#define ID_TEXT_0     (GUI_ID_USER + 0x16)
-#define ID_BUTTON_0     (GUI_ID_USER + 0x17)
-#define ID_TEXT_1     (GUI_ID_USER + 0x18)
-#define ID_TEXT_2     (GUI_ID_USER + 0x19)
-#define ID_TEXT_3     (GUI_ID_USER + 0x1A)
-#define ID_DROPDOWN_0     (GUI_ID_USER + 0x1B)
-#define ID_DROPDOWN_1     (GUI_ID_USER + 0x1C)
-#define ID_DROPDOWN_2     (GUI_ID_USER + 0x1D)
-#define ID_CHECKBOX_0     (GUI_ID_USER + 0x1F)
+#define ID_WINDOW_0     (GUI_ID_USER + 0x00)
+#define ID_TEXT_0     (GUI_ID_USER + 0x01)
+#define ID_BUTTON_0     (GUI_ID_USER + 0x02)
+#define ID_TEXT_1     (GUI_ID_USER + 0x03)
+#define ID_TEXT_2     (GUI_ID_USER + 0x04)
+#define ID_TEXT_3     (GUI_ID_USER + 0x05)
+#define ID_DROPDOWN_0     (GUI_ID_USER + 0x06)
+#define ID_DROPDOWN_1     (GUI_ID_USER + 0x07)
+#define ID_DROPDOWN_2     (GUI_ID_USER + 0x08)
+#define ID_CHECKBOX_0     (GUI_ID_USER + 0x09)
+#define ID_LISTBOX_0     (GUI_ID_USER + 0x0A)
+#define ID_TEXT_4     (GUI_ID_USER + 0x0B)
 
 
 // USER START (Optionally insert additional defines)
@@ -74,6 +76,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { DROPDOWN_CreateIndirect, "Seconds", ID_DROPDOWN_1, 330, 70, 80, 18, 0, 0x0, 0 },
   { DROPDOWN_CreateIndirect, "Minutes", ID_DROPDOWN_2, 190, 70, 80, 18, 0, 0x0, 0 },
   { CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_0, 5, 100, 80, 20, 0, 0x0, 0 },
+  { LISTBOX_CreateIndirect, "Listbox", ID_LISTBOX_0, 5, 150, 120, 100, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "alarm list", ID_TEXT_4, 5, 130, 80, 20, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -180,6 +184,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
     CHECKBOX_SetText(hItem, "Enable");
     CHECKBOX_SetFont(hItem, GUI_FONT_16_1);
+    //
+    // Initialization of 'alarm list'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+    TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
+    TEXT_SetFont(hItem, GUI_FONT_16_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
     char buffer[10];
@@ -212,6 +222,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     }
 
     set_alarm_dropdown_time_init(pMsg);
+
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
+    CHECKBOX_SetState(hItem, enable_alarm);
 
     // USER END
     break;
@@ -309,6 +322,24 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
         enable_alarm = CHECKBOX_GetState(hItem);
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_LISTBOX_0: // Notifications sent by 'Listbox'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      case WM_NOTIFICATION_SEL_CHANGED:
+        // USER START (Optionally insert code for reacting on notification message)
         // USER END
         break;
       // USER START (Optionally insert additional code for further notification handling)

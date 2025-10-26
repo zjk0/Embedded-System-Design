@@ -1,6 +1,14 @@
 #pragma once
 
 #include <stdint.h>
+#include "main.h"
+
+#define MIDI_OK 1
+#define MIDI_ERROR 0
+#define MIDI_AGAIN 2
+
+#define HEADER_DECODING 0
+#define TRACK_DECODING 1
 
 // MIDI Channel Events
 #define NOTE_OFF 0x80
@@ -14,7 +22,7 @@
 #define CHANNEL_EVENT_UP 0xEF
 
 // The flag of meta events
-#define META_EVENT_PREFIX 0xFF
+#define META_EVENT_TYPE 0xFF
 
 // MIDI Meta Events
 #define META_SEQUENCE_NUMBER 0x00
@@ -39,6 +47,8 @@
 #define SYSEX_EVENT_1 0xF0
 #define SYSEX_EVENT_2 0xF7
 
+#define MIDI_HEADER_LEN 14
+
 typedef struct {
     uint32_t MThd;
     uint32_t size;
@@ -49,16 +59,33 @@ typedef struct {
 
 typedef struct {
     uint32_t delta_time;
-    uint8_t event_type_and_channel;
+    uint8_t status;
     uint8_t param1;
     uint8_t param2;
     uint8_t is_meta_event;
+    uint8_t is_sysex_event;
 } MIDI_Event;
 
 typedef struct {
     uint32_t MTrk;
     uint32_t size;
-    uint8_t last_event;
-    MIDI_Event events;
-} MIDI_Track_Header;
+    uint8_t last_status;
+    MIDI_Event event;
+} MIDI_Track;
 
+typedef struct {
+    MIDI_Header header;
+    MIDI_Track track;
+} MIDI_Info;
+
+extern uint8_t decode_status;
+extern MIDI_Info midi_info;
+
+uint32_t convert32bit (uint32_t data);
+uint16_t convert16bit (uint16_t data);
+int is_midi_header_id (uint8_t* bytes);
+int is_midi_track_id (uint8_t* bytes);
+int midi_decode_header (MIDI_Info* midi_info, uint8_t* bytes);
+int midi_decode_track_header (MIDI_Info* midi_info, uint8_t* bytes);
+int midi_decode_track_event (MIDI_Info* midi_info, uint8_t* bytes, uint32_t len);
+uint32_t get_variable_value (uint8_t* bytes, uint32_t* offset);
