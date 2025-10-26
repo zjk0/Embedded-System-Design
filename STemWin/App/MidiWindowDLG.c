@@ -355,6 +355,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
         index = DROPDOWN_GetSel(hItem);
         midi_path = merge_str(midi_folder, midi_files[index]);
+        play_midi(midi_path);
         // f_open(&SDFile, (const TCHAR*)midi_path, FA_READ);
         // while (f_read(&SDFile, &midi_data, 1, &bytes_read) == FR_OK && bytes_read == 1) {
         //   printf("%X\n", midi_data);

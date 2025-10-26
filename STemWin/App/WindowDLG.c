@@ -225,7 +225,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
   case WM_TIMER:
     update_date(pMsg);
     WM_RestartTimer(pMsg->Data.v, 1000);
-    if (is_alarm() && enable_alarm) {
+    if (is_alarm()) {
       WM_DeleteWindow(pMsg->hWin);
       CreateAlarmWindow();
     }

@@ -43,12 +43,22 @@
 #define ID_DROPDOWN_0     (GUI_ID_USER + 0x06)
 #define ID_DROPDOWN_1     (GUI_ID_USER + 0x07)
 #define ID_DROPDOWN_2     (GUI_ID_USER + 0x08)
-#define ID_CHECKBOX_0     (GUI_ID_USER + 0x09)
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x0A)
 #define ID_TEXT_4     (GUI_ID_USER + 0x0B)
+#define ID_BUTTON_1     (GUI_ID_USER + 0x0C)
+#define ID_BUTTON_2     (GUI_ID_USER + 0x0D)
+#define ID_BUTTON_3     (GUI_ID_USER + 0x0E)
 
 
 // USER START (Optionally insert additional defines)
+
+#define MAX_ALARM_NUM 5
+#define ALARM_ENABLE 1
+#define ALARM_DISABLE 0
+#define NO_ALARM 2
+#define CHANGE_ALARM_STATE 0
+#define ADD_NEW_ALARM 1
+
 // USER END
 
 /*********************************************************************
@@ -75,9 +85,11 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { DROPDOWN_CreateIndirect, "Hours", ID_DROPDOWN_0, 45, 70, 80, 18, 0, 0x0, 0 },
   { DROPDOWN_CreateIndirect, "Seconds", ID_DROPDOWN_1, 330, 70, 80, 18, 0, 0x0, 0 },
   { DROPDOWN_CreateIndirect, "Minutes", ID_DROPDOWN_2, 190, 70, 80, 18, 0, 0x0, 0 },
-  { CHECKBOX_CreateIndirect, "Checkbox", ID_CHECKBOX_0, 5, 100, 80, 20, 0, 0x0, 0 },
-  { LISTBOX_CreateIndirect, "Listbox", ID_LISTBOX_0, 5, 150, 120, 100, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "alarm list", ID_TEXT_4, 5, 130, 80, 20, 0, 0x0, 0 },
+  { LISTBOX_CreateIndirect, "Listbox", ID_LISTBOX_0, 70, 160, 120, 100, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "alarm list", ID_TEXT_4, 5, 160, 80, 20, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Enable", ID_BUTTON_1, 5, 100, 80, 40, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Disable", ID_BUTTON_2, 115, 100, 80, 40, 0, 0x0, 0 },
+  { BUTTON_CreateIndirect, "Delete", ID_BUTTON_3, 225, 100, 80, 40, 0, 0x0, 0 },
   // USER START (Optionally insert additional widgets)
   // USER END
 };
@@ -93,12 +105,15 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 extern WM_HWIN CreateWindow(void);
 
-int alarm_hours;
-int alarm_minutes;
-int alarm_seconds;
-int enable_alarm = 0;
+int alarm_hours[MAX_ALARM_NUM];
+int alarm_minutes[MAX_ALARM_NUM];
+int alarm_seconds[MAX_ALARM_NUM];
+int enable_alarm[MAX_ALARM_NUM] = {NO_ALARM, NO_ALARM, NO_ALARM, NO_ALARM, NO_ALARM};
+int alarm_num = 0;
+int alarm_index = 0;
+int enable_way = ADD_NEW_ALARM;
 
-void set_alarm_dropdown_time_init (WM_MESSAGE * pMsg) {
+void dropdown_time_init (WM_MESSAGE * pMsg) {
   WM_HWIN hItem;
   RTC_TimeTypeDef time;
   RTC_DateTypeDef date;
@@ -109,17 +124,31 @@ void set_alarm_dropdown_time_init (WM_MESSAGE * pMsg) {
   // Init hours dropdown
   hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
   DROPDOWN_SetSel(hItem, time.Hours);
-  alarm_hours = time.Hours;
 
   // Init minutes dropdown
   hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_2);
   DROPDOWN_SetSel(hItem, time.Minutes);
-  alarm_minutes = time.Minutes;
 
   // Init seconds dropdown
   hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
   DROPDOWN_SetSel(hItem, time.Seconds);
-  alarm_seconds = time.Seconds;
+}
+
+void alarm_list_init (WM_MESSAGE * pMsg) {
+  WM_HWIN hItem;
+  hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+
+  char alarm_time[25];
+  for (int i = 0; i < alarm_num; i++) {
+    if (enable_alarm[i] == ALARM_ENABLE) {
+      sprintf(alarm_time, "%02d:%02d:%02d enable", alarm_hours[i], alarm_minutes[i], alarm_seconds[i]);
+      LISTBOX_AddString(hItem, alarm_time);
+    }
+    else if (enable_alarm[i] == ALARM_DISABLE) {
+      sprintf(alarm_time, "%02d:%02d:%02d disable", alarm_hours[i], alarm_minutes[i], alarm_seconds[i]);
+      LISTBOX_AddString(hItem, alarm_time);
+    }
+  }
 }
 
 int is_alarm (void) {
@@ -128,9 +157,12 @@ int is_alarm (void) {
   HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
   HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 
-  if (time.Hours == alarm_hours && time.Minutes == alarm_minutes && time.Seconds == alarm_seconds) {
-    return 1;
+  for (int i = 0; i < alarm_num; i++) {
+    if (time.Hours == alarm_hours[i] && time.Minutes == alarm_minutes[i] && time.Seconds == alarm_seconds[i] && enable_alarm[i] == ALARM_ENABLE) {
+      return 1;
+    }
   }
+
   return 0;
 }
 
@@ -179,17 +211,26 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     TEXT_SetFont(hItem, GUI_FONT_16_1);
     TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
     //
-    // Initialization of 'Checkbox'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
-    CHECKBOX_SetText(hItem, "Enable");
-    CHECKBOX_SetFont(hItem, GUI_FONT_16_1);
-    //
     // Initialization of 'alarm list'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
     TEXT_SetTextAlign(hItem, GUI_TA_LEFT | GUI_TA_VCENTER);
     TEXT_SetFont(hItem, GUI_FONT_16_1);
+    //
+    // Initialization of 'Enable'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Disable'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_2);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
+    //
+    // Initialization of 'Delete'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+    BUTTON_SetFont(hItem, GUI_FONT_20_1);
     // USER START (Optionally insert additional code for further widget initialization)
 
     char buffer[10];
@@ -221,10 +262,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       DROPDOWN_AddString(hItem, buffer);
     }
 
-    set_alarm_dropdown_time_init(pMsg);
-
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
-    CHECKBOX_SetState(hItem, enable_alarm);
+    dropdown_time_init(pMsg);
+    alarm_list_init(pMsg);
 
     // USER END
     break;
@@ -252,6 +291,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
@@ -260,8 +300,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         break;
       case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
-        alarm_hours = DROPDOWN_GetSel(hItem);
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       // USER START (Optionally insert additional code for further notification handling)
@@ -272,6 +311,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
@@ -280,8 +320,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         break;
       case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
-        alarm_seconds = DROPDOWN_GetSel(hItem);
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       // USER START (Optionally insert additional code for further notification handling)
@@ -292,6 +331,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
@@ -300,28 +340,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         break;
       case WM_NOTIFICATION_SEL_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_2);
-        alarm_minutes = DROPDOWN_GetSel(hItem);
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_CHECKBOX_0: // Notifications sent by 'Checkbox'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_VALUE_CHANGED:
-        // USER START (Optionally insert code for reacting on notification message)
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_CHECKBOX_0);
-        enable_alarm = CHECKBOX_GetState(hItem);
+        enable_way = ADD_NEW_ALARM;
         // USER END
         break;
       // USER START (Optionally insert additional code for further notification handling)
@@ -332,6 +351,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+        alarm_index = LISTBOX_GetSel(hItem);
+        enable_way = CHANGE_ALARM_STATE;
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
@@ -339,6 +361,89 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         // USER END
         break;
       case WM_NOTIFICATION_SEL_CHANGED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_1: // Notifications sent by 'Enable'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        if (enable_way == ADD_NEW_ALARM) {
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_0);
+          alarm_hours[alarm_num] = DROPDOWN_GetSel(hItem);
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_1);
+          alarm_seconds[alarm_num] = DROPDOWN_GetSel(hItem);
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_2);
+          alarm_minutes[alarm_num] = DROPDOWN_GetSel(hItem);
+
+          enable_alarm[alarm_num] = ALARM_ENABLE;
+
+          char alarm_time[25];
+          sprintf(alarm_time, "%02d:%02d:%02d enable", alarm_hours[alarm_num], alarm_minutes[alarm_num], alarm_seconds[alarm_num]);
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+          LISTBOX_AddString(hItem, alarm_time);
+
+          if (alarm_num < MAX_ALARM_NUM) {
+            alarm_num++;
+          }
+        }
+        else if (enable_way == CHANGE_ALARM_STATE) {
+          enable_alarm[alarm_index] = ALARM_ENABLE;
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+          char alarm_time[25];
+          sprintf(alarm_time, "%02d:%02d:%02d enable", alarm_hours[alarm_index], alarm_minutes[alarm_index], alarm_seconds[alarm_index]);
+          LISTBOX_SetString(hItem, alarm_time, alarm_index);
+        }
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_2: // Notifications sent by 'Disable'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        enable_alarm[alarm_index] = ALARM_DISABLE;
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+        char alarm_time[25];
+        sprintf(alarm_time, "%02d:%02d:%02d disable", alarm_hours[alarm_index], alarm_minutes[alarm_index], alarm_seconds[alarm_index]);
+        LISTBOX_SetString(hItem, alarm_time, alarm_index);
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
+        // USER START (Optionally insert code for reacting on notification message)
+        // USER END
+        break;
+      // USER START (Optionally insert additional code for further notification handling)
+      // USER END
+      }
+      break;
+    case ID_BUTTON_3: // Notifications sent by 'Delete'
+      switch(NCode) {
+      case WM_NOTIFICATION_CLICKED:
+        // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_LISTBOX_0);
+        LISTBOX_DeleteItem(hItem, alarm_index);
+        for (int i = alarm_index; i < alarm_num - 1; i++) {
+          alarm_hours[i] = alarm_hours[i + 1];
+          alarm_minutes[i] = alarm_minutes[i + 1];
+          alarm_seconds[i] = alarm_seconds[i + 1];
+          enable_alarm[i] = enable_alarm[i + 1];
+        }
+        alarm_num--;
+        enable_alarm[alarm_num] = NO_ALARM;
+        // USER END
+        break;
+      case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
         // USER END
         break;
