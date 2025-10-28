@@ -187,6 +187,27 @@ void stop_buzzer (void) {
   HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
 }
 
+uint32_t read_variable_value (FIL* fp) {
+    uint32_t value = 0;
+    uint8_t byte;
+    FRESULT res;
+    UINT byte_read;
+
+    while (1) {
+        res = f_read(fp, &byte, 1, &byte_read);
+        if (res != FR_OK && byte_read != 1) {
+            return 0xFFFFFFFF;
+        }
+        
+        value = (value << 7) | (byte & 0x7F);
+        if (!(byte & 0x80)) {
+            break;
+        }
+    }
+
+    return value;
+}
+
 int play_midi (char* midi_path) {
   FRESULT res;
 
@@ -219,69 +240,94 @@ int play_midi (char* midi_path) {
       return MIDI_ERROR;
     }
 
-    // Decode the events of track
-    free(midi_buffer);
-    midi_buffer = malloc(midi_info.track.size);
-    midi_info.track.last_status = 0;
-    res = f_read(&SDFile, midi_buffer, midi_info.track.size, &bytes_read);
-    if (res != FR_OK || bytes_read != midi_info.track.size) {
-      return MIDI_ERROR;
-    }
-
-    uint32_t offset = 0;  // Note where the position is
     uint8_t event_type;
     uint8_t channel;
-
+    DWORD event_now_ptr;
+    uint8_t midi_byte;
 
     while (1) {
-      midi_info.track.event.delta_time = get_variable_value(midi_buffer, &offset);
+      midi_info.track.event.delta_time = read_variable_value(&SDFile);
 
-      midi_info.track.event.status = midi_buffer[offset];
-      offset++;
+      res = f_read(&SDFile, &midi_byte, 1, &bytes_read);
+      if (res != FR_OK || bytes_read != 1) {
+        return MIDI_ERROR;
+      }
+      midi_info.track.event.status = midi_byte;
 
       if (midi_info.track.event.status < CHANNEL_EVENT_DOWN) {
         midi_info.track.event.status = midi_info.track.last_status;
-        offset--;
+        event_now_ptr = f_tell(&SDFile);
+        if (f_lseek(&SDFile, event_now_ptr - 1) != FR_OK) {
+          return MIDI_ERROR;
+        }
       }
       else {
         midi_info.track.last_status = midi_info.track.event.status;
       }
 
       if (midi_info.track.event.status == META_EVENT_TYPE) {
-        uint8_t meta_type = midi_buffer[offset];
-        offset++;
-        uint32_t meta_len = get_variable_value(midi_buffer, &offset);
+        res = f_read(&SDFile, &midi_byte, 1, &bytes_read);
+        if (res != FR_OK || bytes_read != 1) {
+          return MIDI_ERROR;
+        }
+        uint8_t meta_type = midi_byte;
+        uint32_t meta_len = read_variable_value(&SDFile);
+
         if (meta_type == META_END_OF_TRACK && meta_len == 0) {
           break;
         }
         else if (meta_type == META_SET_TEMPO) {
-          tempo = (midi_buffer[offset] << 16) | (midi_buffer[offset + 1] << 8) | (midi_buffer[offset + 2]);
-          offset += 3;
+          uint8_t tempo_bytes[3];
+          res = f_read(&SDFile, tempo_bytes, 3, &bytes_read);
+          if (res != FR_OK || bytes_read != 3) {
+            return MIDI_ERROR;
+          }
+          tempo = (tempo_bytes[0] << 16) | (tempo_bytes[1] << 8) | (tempo_bytes[2]);
         }
         else {
-          offset += meta_len;
+          uint32_t meta_len = read_variable_value(&SDFile);
+          event_now_ptr = f_tell(&SDFile);
+          f_lseek(&SDFile, event_now_ptr + meta_len);
         }
       }
       else if (midi_info.track.event.status >= CHANNEL_EVENT_DOWN && midi_info.track.event.status <= CHANNEL_EVENT_UP) {
         event_type = midi_info.track.event.status & 0xF0;
         channel = midi_info.track.event.status & 0x0F;
 
-        if (event_type == NOTE_OFF) {
-          midi_info.track.event.param1 = midi_buffer[offset++];  // note number
-          midi_info.track.event.param2 = midi_buffer[offset++];  // velocity
-          stop_buzzer();
-        }
-        else if (event_type == NOTE_ON) {
-          midi_info.track.event.param1 = midi_buffer[offset++];  // note number
-          midi_info.track.event.param2 = midi_buffer[offset++];  // velocity
-
-          if (midi_info.track.event.param2 > 0) {
-            play_buzzer(midi_info.track.event.param1, midi_info.track.event.param2);
+        if (event_type == NOTE_OFF || event_type == NOTE_ON) {
+          uint8_t param[2];
+          res = f_read(&SDFile, param, 2, &bytes_read);
+          if (res != FR_OK || bytes_read != 2) {
+            return MIDI_ERROR;
           }
-          else {
+          midi_info.track.event.param1 = param[0];  // note number
+          midi_info.track.event.param2 = param[1];  // velocity
+
+          if (event_type == NOTE_OFF) {
             stop_buzzer();
           }
+          else if (event_type == NOTE_ON) {
+            if (midi_info.track.event.param2 > 0) {
+              play_buzzer(midi_info.track.event.param1, midi_info.track.event.param2);
+            }
+            else {
+              stop_buzzer();
+            }
+          }
         }
+        else if (event_type == PROGRAM_CHANGE || event_type == CHANNEL_AFTERTOUCH) {
+          event_now_ptr = f_tell(&SDFile);
+          f_lseek(&SDFile, event_now_ptr + 1);
+        }
+        else {
+          event_now_ptr = f_tell(&SDFile);
+          f_lseek(&SDFile, event_now_ptr + 2);
+        }
+      }
+      else if (midi_info.track.event.status == SYSEX_EVENT_1 || midi_info.track.event.status == SYSEX_EVENT_2) {
+        uint32_t len = read_variable_value(&SDFile);
+        event_now_ptr = f_tell(&SDFile);
+        f_lseek(&SDFile, event_now_ptr + len);
       }
 
       uint32_t real_time = midi_info.track.event.delta_time * tempo / midi_info.header.time_division;
@@ -356,10 +402,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         index = DROPDOWN_GetSel(hItem);
         midi_path = merge_str(midi_folder, midi_files[index]);
         play_midi(midi_path);
-        // f_open(&SDFile, (const TCHAR*)midi_path, FA_READ);
-        // while (f_read(&SDFile, &midi_data, 1, &bytes_read) == FR_OK && bytes_read == 1) {
-        //   printf("%X\n", midi_data);
-        // }
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:

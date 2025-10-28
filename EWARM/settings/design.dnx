@@ -9,7 +9,7 @@
         <stlinkResetStrategy>2</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>112351409</Checksum>
+        <Checksum>1272688531</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -109,8 +109,9 @@
     </DisassembleMode>
     <Breakpoints2>
         <Bp0>_ 1 "EMUL_DATA_LOG" "free_bytes" 0 0</Bp0>
-        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\STemWin\App\MidiWindowDLG.c}.357.9" 0 0 1 "" 0 "" 0</Bp1>
-        <Count>2</Count>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\STemWin\App\MidiWindowDLG.c}.249.7" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\STemWin\App\MidiWindowDLG.c}.255.7" 0 0 1 "" 0 "" 0</Bp2>
+        <Count>3</Count>
     </Breakpoints2>
     <TermIOLog>
         <LoggingEnabled>_ 0</LoggingEnabled>

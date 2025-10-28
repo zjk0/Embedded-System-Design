@@ -87,5 +87,4 @@ int is_midi_header_id (uint8_t* bytes);
 int is_midi_track_id (uint8_t* bytes);
 int midi_decode_header (MIDI_Info* midi_info, uint8_t* bytes);
 int midi_decode_track_header (MIDI_Info* midi_info, uint8_t* bytes);
-int midi_decode_track_event (MIDI_Info* midi_info, uint8_t* bytes, uint32_t len);
 uint32_t get_variable_value (uint8_t* bytes, uint32_t* offset);
