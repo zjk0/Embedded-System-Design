@@ -22,10 +22,6 @@
 * Initial font height:  18                                           *
 * Range disabled:       0000 - FFFF                                  *
 * Read pattern file: F:\none\Study\Electron\Embedded-System-Design\ChineseFont\Chinese_UTF16.txt*
-* Range disabled:       0000 - FFFF                                  *
-* Read pattern file: F:\none\Study\Electron\Embedded-System-Design\ChineseFont\Chinese_UTF16.txt*
-* Read pattern file: F:\none\Study\Electron\Embedded-System-Design\ChineseFont\Chinese_UTF16.txt*
-* Read pattern file: F:\none\Study\Electron\Embedded-System-Design\ChineseFont\Chinese_UTF16.txt*
 *                                                                    *
 **********************************************************************
 */
@@ -2063,6 +2059,26 @@ GUI_CONST_STORAGE unsigned char acGUI_Fontchinese_6210[ 54] = { /* code 6210 */
   _X_____X,________,X_______,
   ________,________,________};
 
+GUI_CONST_STORAGE unsigned char acGUI_Fontchinese_627E[ 54] = { /* code 627E */
+  ____X___,__XX____,________,
+  ____X___,__X_XX__,________,
+  ____X___,__X__XX_,________,
+  ____X___,__X___X_,________,
+  __XXXXXX,__X____X,________,
+  ____X___,XXXXXXX_,________,
+  ____X___,__X_____,________,
+  ____X__X,__X___X_,________,
+  ____XXX_,__X___X_,________,
+  __XXX___,__X__X__,________,
+  _X__X___,__X_X___,________,
+  ____X___,___X____,________,
+  ____X___,__XX____,________,
+  ____X___,XX__X__X,________,
+  ____X__X,____XX_X,________,
+  __XXX___,______XX,________,
+  ____X___,_______X,X_______,
+  ________,________,________};
+
 GUI_CONST_STORAGE unsigned char acGUI_Fontchinese_62E9[ 54] = { /* code 62E9 */
   ____X___,________,________,
   ____X___,X_XXXXX_,________,
@@ -2864,7 +2880,7 @@ GUI_CONST_STORAGE unsigned char acGUI_Fontchinese_FF1A[ 54] = { /* code FF1A, FU
   ________,________,________,
   ________,________,________};
 
-GUI_CONST_STORAGE GUI_CHARINFO GUI_Fontchinese_CharInfo[141] = {
+GUI_CONST_STORAGE GUI_CHARINFO GUI_Fontchinese_CharInfo[142] = {
    {   9,   9,  2, acGUI_Fontchinese_002B } /* code 002B */
   ,{   9,   9,  2, acGUI_Fontchinese_002D } /* code 002D */
   ,{   9,   9,  2, acGUI_Fontchinese_002E } /* code 002E */
@@ -2966,6 +2982,7 @@ GUI_CONST_STORAGE GUI_CHARINFO GUI_Fontchinese_CharInfo[141] = {
   ,{  18,  18,  3, acGUI_Fontchinese_5F0F } /* code 5F0F */
   ,{  18,  18,  3, acGUI_Fontchinese_5F55 } /* code 5F55 */
   ,{  18,  18,  3, acGUI_Fontchinese_6210 } /* code 6210 */
+  ,{  18,  18,  3, acGUI_Fontchinese_627E } /* code 627E */
   ,{  18,  18,  3, acGUI_Fontchinese_62E9 } /* code 62E9 */
   ,{  18,  18,  3, acGUI_Fontchinese_64AD } /* code 64AD */
   ,{  18,  18,  3, acGUI_Fontchinese_653E } /* code 653E */
@@ -3008,275 +3025,282 @@ GUI_CONST_STORAGE GUI_CHARINFO GUI_Fontchinese_CharInfo[141] = {
   ,{  18,  18,  3, acGUI_Fontchinese_FF1A } /* code FF1A */
 };
 
-GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop75 = {
+GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop76 = {
    0xFF1A /* first character */
   ,0xFF1A /* last character  */
-  ,&GUI_Fontchinese_CharInfo[140] /* address of first character */
+  ,&GUI_Fontchinese_CharInfo[141] /* address of first character */
   ,(GUI_CONST_STORAGE GUI_FONT_PROP *)0 /* pointer to next GUI_FONT_PROP */
 };
 
-GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop74 = {
+GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop75 = {
    0x9996 /* first character */
   ,0x9996 /* last character  */
+  ,&GUI_Fontchinese_CharInfo[140] /* address of first character */
+  ,&GUI_Fontchinese_Prop76 /* pointer to next GUI_FONT_PROP */
+};
+
+GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop74 = {
+   0x9891 /* first character */
+  ,0x9891 /* last character  */
   ,&GUI_Fontchinese_CharInfo[139] /* address of first character */
   ,&GUI_Fontchinese_Prop75 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop73 = {
-   0x9891 /* first character */
-  ,0x9891 /* last character  */
+   0x95F9 /* first character */
+  ,0x95F9 /* last character  */
   ,&GUI_Fontchinese_CharInfo[138] /* address of first character */
   ,&GUI_Fontchinese_Prop74 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop72 = {
-   0x95F9 /* first character */
-  ,0x95F9 /* last character  */
+   0x95F4 /* first character */
+  ,0x95F4 /* last character  */
   ,&GUI_Fontchinese_CharInfo[137] /* address of first character */
   ,&GUI_Fontchinese_Prop73 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop71 = {
-   0x95F4 /* first character */
-  ,0x95F4 /* last character  */
+   0x949F /* first character */
+  ,0x949F /* last character  */
   ,&GUI_Fontchinese_CharInfo[136] /* address of first character */
   ,&GUI_Fontchinese_Prop72 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop70 = {
-   0x949F /* first character */
-  ,0x949F /* last character  */
+   0x91CD /* first character */
+  ,0x91CD /* last character  */
   ,&GUI_Fontchinese_CharInfo[135] /* address of first character */
   ,&GUI_Fontchinese_Prop71 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop69 = {
-   0x91CD /* first character */
-  ,0x91CD /* last character  */
+   0x9009 /* first character */
+  ,0x9009 /* last character  */
   ,&GUI_Fontchinese_CharInfo[134] /* address of first character */
   ,&GUI_Fontchinese_Prop70 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop68 = {
-   0x9009 /* first character */
-  ,0x9009 /* last character  */
+   0x8FD4 /* first character */
+  ,0x8FD4 /* last character  */
   ,&GUI_Fontchinese_CharInfo[133] /* address of first character */
   ,&GUI_Fontchinese_Prop69 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop67 = {
-   0x8FD4 /* first character */
-  ,0x8FD4 /* last character  */
+   0x8BD5 /* first character */
+  ,0x8BD5 /* last character  */
   ,&GUI_Fontchinese_CharInfo[132] /* address of first character */
   ,&GUI_Fontchinese_Prop68 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop66 = {
-   0x8BD5 /* first character */
-  ,0x8BD5 /* last character  */
+   0x8BBE /* first character */
+  ,0x8BBE /* last character  */
   ,&GUI_Fontchinese_CharInfo[131] /* address of first character */
   ,&GUI_Fontchinese_Prop67 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop65 = {
-   0x8BBE /* first character */
-  ,0x8BBE /* last character  */
+   0x8868 /* first character */
+  ,0x8868 /* last character  */
   ,&GUI_Fontchinese_CharInfo[130] /* address of first character */
   ,&GUI_Fontchinese_Prop66 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop64 = {
-   0x8868 /* first character */
-  ,0x8868 /* last character  */
+   0x8303 /* first character */
+  ,0x8303 /* last character  */
   ,&GUI_Fontchinese_CharInfo[129] /* address of first character */
   ,&GUI_Fontchinese_Prop65 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop63 = {
-   0x8303 /* first character */
-  ,0x8303 /* last character  */
+   0x7F6E /* first character */
+  ,0x7F6E /* last character  */
   ,&GUI_Fontchinese_CharInfo[128] /* address of first character */
   ,&GUI_Fontchinese_Prop64 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop62 = {
-   0x7F6E /* first character */
-  ,0x7F6E /* last character  */
+   0x7ED3 /* first character */
+  ,0x7ED3 /* last character  */
   ,&GUI_Fontchinese_CharInfo[127] /* address of first character */
   ,&GUI_Fontchinese_Prop63 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop61 = {
-   0x7ED3 /* first character */
-  ,0x7ED3 /* last character  */
+   0x79D2 /* first character */
+  ,0x79D2 /* last character  */
   ,&GUI_Fontchinese_CharInfo[126] /* address of first character */
   ,&GUI_Fontchinese_Prop62 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop60 = {
-   0x79D2 /* first character */
-  ,0x79D2 /* last character  */
+   0x7693 /* first character */
+  ,0x7693 /* last character  */
   ,&GUI_Fontchinese_CharInfo[125] /* address of first character */
   ,&GUI_Fontchinese_Prop61 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop59 = {
-   0x7693 /* first character */
-  ,0x7693 /* last character  */
+   0x7535 /* first character */
+  ,0x7535 /* last character  */
   ,&GUI_Fontchinese_CharInfo[124] /* address of first character */
   ,&GUI_Fontchinese_Prop60 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop58 = {
-   0x7535 /* first character */
-  ,0x7535 /* last character  */
+   0x7434 /* first character */
+  ,0x7434 /* last character  */
   ,&GUI_Fontchinese_CharInfo[123] /* address of first character */
   ,&GUI_Fontchinese_Prop59 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop57 = {
-   0x7434 /* first character */
-  ,0x7434 /* last character  */
+   0x7387 /* first character */
+  ,0x7387 /* last character  */
   ,&GUI_Fontchinese_CharInfo[122] /* address of first character */
   ,&GUI_Fontchinese_Prop58 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop56 = {
-   0x7387 /* first character */
-  ,0x7387 /* last character  */
+   0x6D4B /* first character */
+  ,0x6D4B /* last character  */
   ,&GUI_Fontchinese_CharInfo[121] /* address of first character */
   ,&GUI_Fontchinese_Prop57 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop55 = {
-   0x6D4B /* first character */
-  ,0x6D4B /* last character  */
+   0x6CA1 /* first character */
+  ,0x6CA1 /* last character  */
   ,&GUI_Fontchinese_CharInfo[120] /* address of first character */
   ,&GUI_Fontchinese_Prop56 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop54 = {
-   0x6CA1 /* first character */
-  ,0x6CA1 /* last character  */
+   0x6B62 /* first character */
+  ,0x6B62 /* last character  */
   ,&GUI_Fontchinese_CharInfo[119] /* address of first character */
   ,&GUI_Fontchinese_Prop55 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop53 = {
-   0x6B62 /* first character */
-  ,0x6B62 /* last character  */
+   0x6B4C /* first character */
+  ,0x6B4C /* last character  */
   ,&GUI_Fontchinese_CharInfo[118] /* address of first character */
   ,&GUI_Fontchinese_Prop54 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop52 = {
-   0x6B4C /* first character */
-  ,0x6B4C /* last character  */
+   0x6A21 /* first character */
+  ,0x6A21 /* last character  */
   ,&GUI_Fontchinese_CharInfo[117] /* address of first character */
   ,&GUI_Fontchinese_Prop53 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop51 = {
-   0x6A21 /* first character */
-  ,0x6A21 /* last character  */
+   0x675F /* first character */
+  ,0x675F /* last character  */
   ,&GUI_Fontchinese_CharInfo[116] /* address of first character */
   ,&GUI_Fontchinese_Prop52 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop50 = {
-   0x675F /* first character */
-  ,0x675F /* last character  */
+   0x671F /* first character */
+  ,0x671F /* last character  */
   ,&GUI_Fontchinese_CharInfo[115] /* address of first character */
   ,&GUI_Fontchinese_Prop51 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop49 = {
-   0x671F /* first character */
-  ,0x671F /* last character  */
-  ,&GUI_Fontchinese_CharInfo[114] /* address of first character */
+   0x6708 /* first character */
+  ,0x6709 /* last character  */
+  ,&GUI_Fontchinese_CharInfo[113] /* address of first character */
   ,&GUI_Fontchinese_Prop50 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop48 = {
-   0x6708 /* first character */
-  ,0x6709 /* last character  */
+   0x66F2 /* first character */
+  ,0x66F2 /* last character  */
   ,&GUI_Fontchinese_CharInfo[112] /* address of first character */
   ,&GUI_Fontchinese_Prop49 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop47 = {
-   0x66F2 /* first character */
-  ,0x66F2 /* last character  */
+   0x6682 /* first character */
+  ,0x6682 /* last character  */
   ,&GUI_Fontchinese_CharInfo[111] /* address of first character */
   ,&GUI_Fontchinese_Prop48 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop46 = {
-   0x6682 /* first character */
-  ,0x6682 /* last character  */
+   0x661F /* first character */
+  ,0x661F /* last character  */
   ,&GUI_Fontchinese_CharInfo[110] /* address of first character */
   ,&GUI_Fontchinese_Prop47 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop45 = {
-   0x661F /* first character */
-  ,0x661F /* last character  */
+   0x65F6 /* first character */
+  ,0x65F6 /* last character  */
   ,&GUI_Fontchinese_CharInfo[109] /* address of first character */
   ,&GUI_Fontchinese_Prop46 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop44 = {
-   0x65F6 /* first character */
-  ,0x65F6 /* last character  */
+   0x65E5 /* first character */
+  ,0x65E5 /* last character  */
   ,&GUI_Fontchinese_CharInfo[108] /* address of first character */
   ,&GUI_Fontchinese_Prop45 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop43 = {
-   0x65E5 /* first character */
-  ,0x65E5 /* last character  */
+   0x65E0 /* first character */
+  ,0x65E0 /* last character  */
   ,&GUI_Fontchinese_CharInfo[107] /* address of first character */
   ,&GUI_Fontchinese_Prop44 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop42 = {
-   0x65E0 /* first character */
-  ,0x65E0 /* last character  */
+   0x65B0 /* first character */
+  ,0x65B0 /* last character  */
   ,&GUI_Fontchinese_CharInfo[106] /* address of first character */
   ,&GUI_Fontchinese_Prop43 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop41 = {
-   0x65B0 /* first character */
-  ,0x65B0 /* last character  */
+   0x6587 /* first character */
+  ,0x6587 /* last character  */
   ,&GUI_Fontchinese_CharInfo[105] /* address of first character */
   ,&GUI_Fontchinese_Prop42 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop40 = {
-   0x6587 /* first character */
-  ,0x6587 /* last character  */
+   0x653E /* first character */
+  ,0x653E /* last character  */
   ,&GUI_Fontchinese_CharInfo[104] /* address of first character */
   ,&GUI_Fontchinese_Prop41 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop39 = {
-   0x653E /* first character */
-  ,0x653E /* last character  */
+   0x64AD /* first character */
+  ,0x64AD /* last character  */
   ,&GUI_Fontchinese_CharInfo[103] /* address of first character */
   ,&GUI_Fontchinese_Prop40 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop38 = {
-   0x64AD /* first character */
-  ,0x64AD /* last character  */
+   0x62E9 /* first character */
+  ,0x62E9 /* last character  */
   ,&GUI_Fontchinese_CharInfo[102] /* address of first character */
   ,&GUI_Fontchinese_Prop39 /* pointer to next GUI_FONT_PROP */
 };
 
 GUI_CONST_STORAGE GUI_FONT_PROP GUI_Fontchinese_Prop37 = {
-   0x62E9 /* first character */
-  ,0x62E9 /* last character  */
+   0x627E /* first character */
+  ,0x627E /* last character  */
   ,&GUI_Fontchinese_CharInfo[101] /* address of first character */
   ,&GUI_Fontchinese_Prop38 /* pointer to next GUI_FONT_PROP */
 };

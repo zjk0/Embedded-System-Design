@@ -511,6 +511,9 @@ const char recording_chinese[] = "\xe5\xbd\x95\xe5\x88\xb6\xe4\xb8\xad";
 const char record_done[] = "\xe5\xbd\x95\xe5\x88\xb6\xe5\xae\x8c\xe6\x88\x90";
 const char record_or_stop[] = "\xe5\xbd\x95\xe5\x88\xb6/\xe5\x81\x9c\xe6\xad\xa2";
 const char idle_chinese[] = "\xe6\x97\xa0";
+const char file_chinese[] = "\xe6\x96\x87\xe4\xbb\xb6";
+const char find_chinese[] = "\xe6\x89\xbe\xe5\x88\xb0";
+const char no_midi_chinese[] = "\xe6\x97\xa0\xe6\x96\x87\xe4\xbb\xb6";
 // const char Mon_chinese[] = "\xe6\x98\x9f\xe6\x9c\x9f\xe4\xb8\x80";
 // const char Tue_chinese[] = "\xe6\x98\x9f\xe6\x9c\x9f\xe4\xba\x8c";
 // const char Wed_chinese[] = "\xe6\x98\x9f\xe6\x9c\x9f\xe4\xb8\x89";
@@ -1027,10 +1030,12 @@ static void _cbAlarmDialog(WM_MESSAGE * pMsg) {
   case WM_INIT_DIALOG:
     // 初始化闹钟响铃窗口
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_ALARM);
-    TEXT_SetFont(hItem, GUI_FONT_32B_ASCII);
+    TEXT_SetFont(hItem, &GUI_Fontchinese);
+    TEXT_SetText(hItem, alarm_come_chinese);
     
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_CLOSE_RING);
-    BUTTON_SetFont(hItem, GUI_FONT_24B_ASCII);
+    BUTTON_SetFont(hItem, &GUI_Fontchinese);
+    BUTTON_SetText(hItem, back_chinese);
     
      HAL_TIM_PWM_Start(&htim12,TIM_CHANNEL_1);
     __HAL_TIM_SetCompare(&htim12, TIM_CHANNEL_1, 500);
@@ -1167,7 +1172,7 @@ static const GUI_WIDGET_CREATE_INFO _aPlayerDialogCreate[] = {
     
     // 返回按钮
     { BUTTON_CreateIndirect, "Back", ID_BUTTON_PIANO_BACK, 180, 240, 120, 40, 0, 0x0, 0 },
-    { TEXT_CreateIndirect, "NUM", ID_TEXT_MIDI_COUNT, 340, 190, 80, 30, 0, 0x0, 0 },
+    { TEXT_CreateIndirect, "NUM", ID_TEXT_MIDI_COUNT, 390, 190, 80, 30, 0, 0x0, 0 },
     { BUTTON_CreateIndirect, "Refresh", ID_BUTTON_REFRESH, 340, 130, 80, 30, 0, 0x0, 0 },
 };
 
@@ -1330,12 +1335,15 @@ static void _cbTimeDomainDialog(WM_MESSAGE * pMsg) {
     GRAPH_SetGridVis(hItem, 1);
     GRAPH_SetGridDistX(hItem, 50);
     GRAPH_SetGridDistY(hItem, 25);
-    GRAPH_SetColor(hItem, GUI_BLACK, GRAPH_CI_BK);
-    GRAPH_SetColor(hItem, GUI_WHITE, GRAPH_CI_GRID);
+    // GRAPH_SetColor(hItem, GUI_BLACK, GRAPH_CI_BK);
+    // GRAPH_SetColor(hItem, GUI_WHITE, GRAPH_CI_GRID);
     
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_TIME_BACK);
     BUTTON_SetFont(hItem, &GUI_Fontchinese);
     BUTTON_SetText(hItem, back_chinese);
+
+    BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
+    BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
     break;
     
   case WM_NOTIFY_PARENT:
@@ -1354,6 +1362,7 @@ static void _cbTimeDomainDialog(WM_MESSAGE * pMsg) {
         
         
         hGraphTimeDomain = 0;
+        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         WM_DeleteWindow(pMsg->hWin);
         CreateADCMainWindow();
         break;
@@ -1414,6 +1423,9 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_RANGE_DOWN);
     BUTTON_SetFont(hItem, &GUI_Fontchinese);
     BUTTON_SetText(hItem, range_down_chinese);
+
+    BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
+    BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
     
     // 添加频率轴标签
     Add_Frequency_Labels(hGraph);
@@ -1472,6 +1484,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         hGraphFrequencyDomain = 0;
+        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         WM_DeleteWindow(pMsg->hWin);
         CreateADCMainWindow();
         break;
@@ -1646,6 +1659,9 @@ static void _cbPianoDialog(WM_MESSAGE * pMsg) {
     TEXT_SetFont(hItem, &GUI_Fontchinese);
     TEXT_SetTextColor(hItem, GUI_DARKBLUE);
     TEXT_SetText(hItem, idle_chinese);
+
+    BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
+    BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
     
     
     // 确保定时器已停止
@@ -1660,6 +1676,7 @@ static void _cbPianoDialog(WM_MESSAGE * pMsg) {
     case ID_BUTTON_PIANO_BACK: // 返回按钮
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
+        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         // 停止PWM输出
         HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
         // 关闭钢琴窗口并返回主窗口
@@ -1740,6 +1757,7 @@ static void _cbPianoDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // 关闭钢琴窗口并打开播放器窗口
+        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         WM_DeleteWindow(pMsg->hWin);
         CreatePlayerWindow();
         break;
@@ -1852,7 +1870,7 @@ static void _cbPlayerDialog(WM_MESSAGE * pMsg) {
         
         // 初始化MIDI文件数量显示
         hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_MIDI_COUNT);
-        TEXT_SetFont(hItem, GUI_FONT_16B_ASCII);
+        TEXT_SetFont(hItem, &GUI_Fontchinese);
         TEXT_SetTextColor(hItem, GUI_GREEN); // 使用绿色显示，更醒目
         
         
@@ -2314,8 +2332,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
     //
     // 初始化音频采集
     //
-    BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
-    BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
+    // BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
+    // BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
 
     FS_Init();  
     _UpdateCalendarDisplay(pMsg->hWin);
@@ -2990,6 +3008,7 @@ void Update_Power_Spectrum_Display(WM_HWIN hGraph)
   
   // 刷新图表
   WM_InvalidateWindow(hGraph);
+  // BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
 }
 
 
@@ -3189,6 +3208,8 @@ WM_HWIN CreateStopwatchWindow(void) {
 void BSP_AUDIO_IN_TransferComplete_CallBack(void) //输入缓冲区采集完成回调函数
 {
 //可以在此处添加代码搬移 audio_input[]中的数据，在主循环中显示或调用 FFT 库处理数据
+  // BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
+
   data_ready = 1;
   
   // 填充FFT输入缓冲区
@@ -3694,10 +3715,10 @@ void UpdateMidiFileCountDisplay(WM_HWIN hWin, uint8_t count) {
     
     char text[30];
     if (count == 0) {
-        sprintf(text, "No MIDI files found");
+        sprintf(text, "%s", no_file_chinese);
         TEXT_SetTextColor(hItem, GUI_RED); // 没有文件时显示红色
     } else {
-        sprintf(text, "Found %d MIDI files", count);
+        sprintf(text, "%s %d %s", find_chinese, count, file_chinese);
         TEXT_SetTextColor(hItem, GUI_GREEN); // 有文件时显示绿色
     }
     
