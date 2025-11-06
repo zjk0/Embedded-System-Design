@@ -1214,6 +1214,9 @@
                 <name>$PROJ_DIR$\..\Src\chinese.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\chinese40.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\crc.c</name>
             </file>
             <file>

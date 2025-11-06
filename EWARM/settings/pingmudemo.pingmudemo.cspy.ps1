@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --backend -f "F:\none\Study\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
+& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
 }
 else
 {
-& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\Study\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --debug_file=$debugfile --backend -f "F:\none\Study\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
+& "F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --debug_file=$debugfile --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
 }

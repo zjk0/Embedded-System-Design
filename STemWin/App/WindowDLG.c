@@ -522,6 +522,9 @@ const char no_midi_chinese[] = "\xe6\x97\xa0\xe6\x96\x87\xe4\xbb\xb6";
 // const char Sat_chinese[] = "\xe6\x98\x9f\xe6\x9c\x9f\xe5\x85\xad";
 // const char Sun_chinese[] = "\xe6\x98\x9f\xe6\x9c\x9f\xe6\x97\xa5";
 
+extern GUI_CONST_STORAGE GUI_FONT GUI_Fontchinese40;
+const char alarm_come_chinese_40[] = "\xe9\x97\xb9\xe9\x92\x9f\xe5\x88\xb0\xe4\xba\x86";
+
 GRAPH_DATA_Handle hData;
 int data;
 static int g_TimerActive = 1; //1=active 0=no active
@@ -1030,8 +1033,8 @@ static void _cbAlarmDialog(WM_MESSAGE * pMsg) {
   case WM_INIT_DIALOG:
     // 初始化闹钟响铃窗口
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_ALARM);
-    TEXT_SetFont(hItem, &GUI_Fontchinese);
-    TEXT_SetText(hItem, alarm_come_chinese);
+    TEXT_SetFont(hItem, &GUI_Fontchinese40);
+    TEXT_SetText(hItem, alarm_come_chinese_40);
     
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_CLOSE_RING);
     BUTTON_SetFont(hItem, &GUI_Fontchinese);
@@ -1757,7 +1760,7 @@ static void _cbPianoDialog(WM_MESSAGE * pMsg) {
       switch(NCode) {
       case WM_NOTIFICATION_CLICKED:
         // 关闭钢琴窗口并打开播放器窗口
-        BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
+        // BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         WM_DeleteWindow(pMsg->hWin);
         CreatePlayerWindow();
         break;
@@ -2886,6 +2889,8 @@ void Update_Waveform_Display(WM_HWIN hGraph)
     
     // 刷新图表
     WM_InvalidateWindow(hGraph);
+
+    // BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
     
     data_ready = 0; // 重置标志
   }
