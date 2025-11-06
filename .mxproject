@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=F:/none/Study/Electron/Embedded-System-Design/pingmudemo/Inc
+HeaderPath=E:/cubeplace/pingmudemo_new/pingmudemo_final/pingmudemo/Inc
 HeaderFiles=sys.h;stm32f7xx_it.h;stm32f7xx_hal_conf.h;main.h;gpio.h;ltdc.h;crc.h;GUIConf.h;HW_Init.h;GUI_App.h;STemwin_wrapper.h;fmc.h;rtc.h;i2c.h;usart.h;adc.h;dma.h;tim.h;sai.h;sdmmc.h;ffconf.h;bsp_driver_sd.h;sd_diskio.h;fatfs.h;fatfs_platform.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_storage_if.h;
-SourcePath=F:/none/Study/Electron/Embedded-System-Design/pingmudemo/Src
+SourcePath=E:/cubeplace/pingmudemo_new/pingmudemo_final/pingmudemo/Src
 SourceFiles=sys.c;stm32f7xx_it.c;stm32f7xx_hal_msp.c;main.c;gpio.c;ltdc.c;crc.c;GUIConf.c;HW_Init.c;GUI_App.c;STemwin_wrapper.c;WindowDLG.c;fmc.c;rtc.c;i2c.c;usart.c;adc.c;dma.c;tim.c;sai.c;sdmmc.c;bsp_driver_sd.c;sd_diskio.c;fatfs.c;fatfs_platform.c;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_storage_if.c;
 
 [PreviousLibFiles]

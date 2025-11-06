@@ -417,6 +417,8 @@ void UpdateStatusText(WM_HWIN hWin, const char *msg, GUI_COLOR color);
 #define ID_TIMER_ANIM    100
 
 
+#define ID_DROPDOWN_RING_SECOND   (GUI_ID_USER + 0x5F)
+
 
 // 频谱显示模式
 // 修改频谱显示模式变量
@@ -440,7 +442,7 @@ static Stopwatch stopwatch = {0, 0, 0};
 static WM_HWIN hStopwatchWindow = 0;
 
 WM_HWIN hPianoWin;
-
+uint8_t g_AlarmSecond = 0;
 //#define ID_BUTTON_SAVE          (GUI_ID_USER + 0x17)
 
 // USER END
@@ -898,7 +900,7 @@ static void _cbSettingsDialog(WM_MESSAGE * pMsg) { //settings page
  
   for (int i = 0; i < 60; i++) {
     char buffer[10];
-    sprintf(buffer, "%02d", i);
+    sprintf(buffer, "%d", i);
     DROPDOWN_AddString(hItem, buffer);
   }
   
@@ -908,7 +910,7 @@ static void _cbSettingsDialog(WM_MESSAGE * pMsg) { //settings page
   DROPDOWN_SetAutoScroll(hItem, 1);
   for (int i = 0; i < 60; i++) {
     char buffer[10];
-    sprintf(buffer, "%02d", i);
+    sprintf(buffer, "%d", i);
     DROPDOWN_AddString(hItem, buffer);
   }
   
@@ -952,6 +954,17 @@ static void _cbSettingsDialog(WM_MESSAGE * pMsg) { //settings page
     sprintf(buffer, "%02d", i);
     DROPDOWN_AddString(hItem, buffer);
   }
+  
+  // 初始化闹钟时间下拉框 - 秒
+  hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_RING_SECOND);
+  DROPDOWN_SetFont(hItem, GUI_FONT_16B_ASCII);
+  DROPDOWN_SetAutoScroll(hItem, 1);
+  for (int i = 0; i < 60; i++) {
+    char buffer[10];
+    sprintf(buffer, "%02d", i);
+    DROPDOWN_AddString(hItem, buffer);
+  }
+    
   
   // 初始化闹钟时间下拉框 - AM/PM
   hItem = WM_GetDialogItem(pMsg->hWin, ID_DROPDOWN_RING_AMPM);
@@ -1106,7 +1119,7 @@ static const GUI_WIDGET_CREATE_INFO _aFreqDomainDialogCreate[] = {
   { WINDOW_CreateIndirect, "Frequency Domain", ID_WINDOW_FREQ_DOMAIN, 0, 0, 480, 272, 0, 0x0, 0 },
   { GRAPH_CreateIndirect, "", ID_GRAPH_FREQ_DOMAIN, 0, 40, 480, 180, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Back", ID_BUTTON_FREQ_BACK, 180, 230, 120, 40, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Test", ID_BUTTON_TEST, 40, 230, 120, 40, 0, 0x0, 0 }, // 新增测试按钮
+  //{ BUTTON_CreateIndirect, "Test", ID_BUTTON_TEST, 40, 230, 120, 40, 0, 0x0, 0 }, // 新增测试按钮
   { BUTTON_CreateIndirect, "Range +", ID_BUTTON_RANGE_UP, 310, 230, 60, 40, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Range -", ID_BUTTON_RANGE_DOWN, 380, 230, 60, 40, 0, 0x0, 0 },
     // 新增模式切换按钮
@@ -1156,7 +1169,7 @@ static const GUI_WIDGET_CREATE_INFO _aPlayerDialogCreate[] = {
     
     // 音乐控制按钮
     { BUTTON_CreateIndirect, "Play", ID_BUTTON_PLAY, 40, 40, 80, 40, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect, "Pause", ID_BUTTON_PAUSE, 130, 40, 80, 40, 0, 0x0, 0 },
+    //{ BUTTON_CreateIndirect, "Pause", ID_BUTTON_PAUSE, 130, 40, 80, 40, 0, 0x0, 0 },
     { BUTTON_CreateIndirect, "Stop", ID_BUTTON_STOP, 220, 40, 80, 40, 0, 0x0, 0 },
     { BUTTON_CreateIndirect, "Prev", ID_BUTTON_PREV, 310, 40, 80, 40, 0, 0x0, 0 },
     { BUTTON_CreateIndirect, "Next", ID_BUTTON_NEXT, 400, 40, 80, 40, 0, 0x0, 0 },
@@ -1165,18 +1178,18 @@ static const GUI_WIDGET_CREATE_INFO _aPlayerDialogCreate[] = {
     { TEXT_CreateIndirect, "Song: Little Star", ID_TEXT_SONG_INFO, 40, 100, 400, 30, 0, 0x0, 0 },
     
     // 音量控制
-    { SLIDER_CreateIndirect, "", ID_SLIDER_VOLUME, 40, 150, 400, 30, 0, 0x0, 0 },
+   // { SLIDER_CreateIndirect, "", ID_SLIDER_VOLUME, 40, 150, 400, 30, 0, 0x0, 0 },
     
     // MIDI文件选择控件
-    { LISTBOX_CreateIndirect, "", ID_LIST_MIDI_FILES, 40, 190, 200, 60, 0, 0x0, 0 },
-    { TEXT_CreateIndirect, "Select a MIDI file", ID_TEXT_SELECTED_FILE, 250, 190, 180, 20, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect, "Play MIDI", ID_BUTTON_PLAY_MIDI, 250, 215, 80, 30, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect, "Stop", ID_BUTTON_STOP_MIDI, 340, 215, 80, 30, 0, 0x0, 0 },
+    { LISTBOX_CreateIndirect, "", ID_LIST_MIDI_FILES, 40, 160, 200, 60, 0, 0x0, 0 },
+    { TEXT_CreateIndirect, "Select a MIDI file", ID_TEXT_SELECTED_FILE, 250, 160, 180, 20, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect, "Play MIDI", ID_BUTTON_PLAY_MIDI, 250, 185, 80, 30, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect, "Stop", ID_BUTTON_STOP_MIDI, 340, 185, 80, 30, 0, 0x0, 0 },
     
     // 返回按钮
     { BUTTON_CreateIndirect, "Back", ID_BUTTON_PIANO_BACK, 180, 240, 120, 40, 0, 0x0, 0 },
-    { TEXT_CreateIndirect, "NUM", ID_TEXT_MIDI_COUNT, 390, 190, 80, 30, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect, "Refresh", ID_BUTTON_REFRESH, 340, 130, 80, 30, 0, 0x0, 0 },
+    { TEXT_CreateIndirect, "NUM", ID_TEXT_MIDI_COUNT, 390, 160, 80, 30, 0, 0x0, 0 },
+    //{ BUTTON_CreateIndirect, "Refresh", ID_BUTTON_REFRESH, 340, 130, 80, 30, 0, 0x0, 0 },
 };
 
 
@@ -1227,18 +1240,16 @@ static const GUI_WIDGET_CREATE_INFO _aSettingsDialogCreate[] = {
   // { BUTTON_CreateIndirect, "SAVE", ID_BUTTON_SAVE, 180, 210, 120, 40, 0, 0x0, 0 },
   
    // 闹钟设置标题
-  { TEXT_CreateIndirect, "Ring Alarm", ID_TEXT_RING_TITLE, 40, 160, 150, 25, 0, 0x0, 0 },
-  //{ WINDOW_CreateIndirect, "Alarm Window", ID_WINDOW_ALARM, 0, 0, 480, 272, 0, 0x0, 0 },
-  
-  // 闹钟时间下拉框
-  { DROPDOWN_CreateIndirect, "Hour", ID_DROPDOWN_RING_HOUR, 40, 180, 70, 70, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "Minute", ID_DROPDOWN_RING_MINUTE, 120, 180, 70, 70, 0, 0x0, 0 },
-  { DROPDOWN_CreateIndirect, "AM/PM", ID_DROPDOWN_RING_AMPM, 200, 180, 90, 40, 0, 0x0, 0 },
-  
-  // 闹钟启用复选框
-  { CHECKBOX_CreateIndirect, "Enable", ID_CHECKBOX_RING_ENABLE, 300, 180, 100, 30, 0, 0x0, 0 },
-  
+   { TEXT_CreateIndirect, "Ring Alarm", ID_TEXT_RING_TITLE, 40, 160, 150, 25, 0, 0x0, 0 },
+
+  { DROPDOWN_CreateIndirect, "Hour",   ID_DROPDOWN_RING_HOUR,   40, 180, 70, 70, 0, 0x0, 0 },
+  { DROPDOWN_CreateIndirect, "Minute", ID_DROPDOWN_RING_MINUTE,120, 180, 70, 70, 0, 0x0, 0 },
+  { DROPDOWN_CreateIndirect, "Second", ID_DROPDOWN_RING_SECOND,200, 180, 70, 70, 0, 0x0, 0 },  // ← 新增
+  { DROPDOWN_CreateIndirect, "AM/PM",  ID_DROPDOWN_RING_AMPM,  280, 180, 90, 40, 0, 0x0, 0 },
+
+  { CHECKBOX_CreateIndirect, "Enable", ID_CHECKBOX_RING_ENABLE, 380, 180, 90, 30, 0, 0x0, 0 },
 };
+  
 /*********************************************************************
 *
 *      设置页面的窗口初始化
@@ -1824,9 +1835,9 @@ static void _cbPlayerDialog(WM_MESSAGE * pMsg) {
         BUTTON_SetFont(hItem, &GUI_Fontchinese);
         BUTTON_SetText(hItem, play_chinese);
         
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_PAUSE);
-        BUTTON_SetFont(hItem, &GUI_Fontchinese);
-        BUTTON_SetText(hItem, pause_chinese);
+//        hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_PAUSE);
+//        BUTTON_SetFont(hItem, &GUI_Fontchinese);
+//        BUTTON_SetText(hItem, pause_chinese);
         
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_STOP);
         BUTTON_SetFont(hItem, &GUI_Fontchinese);
@@ -1845,10 +1856,10 @@ static void _cbPlayerDialog(WM_MESSAGE * pMsg) {
         TEXT_SetTextColor(hItem, GUI_BLACK);
         TEXT_SetText(hItem, song_little_star_chinese);
         
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_VOLUME);
-        SLIDER_SetRange(hItem, 0, 100);
-        SLIDER_SetValue(hItem, 80); // 默认音量80%
-        SLIDER_SetNumTicks(hItem, 10);
+//        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_VOLUME);
+//        SLIDER_SetRange(hItem, 0, 100);
+//        SLIDER_SetValue(hItem, 80); // 默认音量80%
+//        SLIDER_SetNumTicks(hItem, 10);
         
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_PIANO_BACK);
         BUTTON_SetFont(hItem, &GUI_Fontchinese);
@@ -2362,7 +2373,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
       hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_ANIM);
       hItem1 = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_ANIM1);
       IMAGE_SetBitmap(hItem, AnimFrames[frame]);
-      IMAGE_SetBitmap(hItem1, AnimFrames1[frame]);
+      //IMAGE_SetBitmap(hItem1, AnimFrames1[1]);
       WM_RestartTimer(pMsg->Data.v, 100);
     }
   } break;
@@ -2565,12 +2576,13 @@ static void SaveDateTimeFromDropdowns(WM_HWIN hWin) {
   
   
   // 转换为24小时制
-  if (is_pm == 1) { // PM
-    new_calendar.hour = (hour_12 % 12) + 12;
-    if (new_calendar.hour == 24) new_calendar.hour = 12; // 处理12 PM特殊情况
-  } else { // AM
-    new_calendar.hour = hour_12 % 12;
-    if (new_calendar.hour == 0) new_calendar.hour = 0; // 处理12 AM特殊情况
+    // 12h -> 24h（0..23）
+  if (is_pm == 0) { // AM
+    // 12 AM -> 00，其它 1..11 AM -> 1..11
+    new_calendar.hour = (hour_12 == 12) ? 0 : hour_12;
+  } else {          // PM
+    // 12 PM -> 12，其它 1..11 PM -> 13..23
+    new_calendar.hour = (hour_12 == 12) ? 12 : (hour_12 + 12);
   }
   
   // 设置秒数为当前秒数（保持连续性）
@@ -2649,25 +2661,34 @@ static const GUI_WIDGET_CREATE_INFO _aAlarmDialogCreate[] = {
  //设置闹钟控件的当前值
 static void SetCurrentAlarmToDropdowns(WM_HWIN hWin) {
   WM_HWIN hItem;
-  
-  // 设置闹钟小时
+
+  // 小时：24h -> 12h（显示）
+  uint8_t h24 = g_AlarmHour;          // 0..23
+  uint8_t am  = (h24 < 12) ? 1 : 0;   // 1=AM,0=PM（仅内部临时）
+  uint8_t h12 = h24 % 12;             // 0..11
+  if (h12 == 0) h12 = 12;             // 12h 显示
+
+  // 小时（DROPDOWN 索引 0..11）
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_HOUR);
-  int hour_12 = g_AlarmHour % 12;
-  if (hour_12 == 0) hour_12 = 12;
-  DROPDOWN_SetSel(hItem, hour_12 - 1);
-  
-  // 设置闹钟分钟
+  DROPDOWN_SetSel(hItem, h12 - 1);
+
+  // 分钟
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_MINUTE);
   DROPDOWN_SetSel(hItem, g_AlarmMinute);
-  
-  // 设置AM/PM
+
+  // 秒 —— 新增
+  hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_SECOND);
+  DROPDOWN_SetSel(hItem, g_AlarmSecond);
+
+  // AM/PM（0=AM,1=PM）
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_AMPM);
-  DROPDOWN_SetSel(hItem, g_AlarmHour >= 12 ? 1 : 0);
-  
-  // 设置启用状态
+  DROPDOWN_SetSel(hItem, (h24 >= 12) ? 1 : 0);
+
+  // 启用状态
   hItem = WM_GetDialogItem(hWin, ID_CHECKBOX_RING_ENABLE);
   CHECKBOX_SetState(hItem, g_AlarmEnable);
 }
+
 
 /*********************************************************************
 *
@@ -2685,38 +2706,38 @@ static void SetCurrentAlarmToDropdowns(WM_HWIN hWin) {
 */
 static void SaveAlarmFromDropdowns(WM_HWIN hWin) {
   WM_HWIN hItem;
-  
-  // 获取闹钟小时
+
+  // 小时（1..12）
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_HOUR);
   int hour_12 = DROPDOWN_GetSel(hItem) + 1;
-  
-  // 获取闹钟分钟
+
+  // 分钟（0..59）
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_MINUTE);
-  g_AlarmMinute = DROPDOWN_GetSel(hItem);
-  
-  // 获取AM/PM
+  g_AlarmMinute = (uint8_t)DROPDOWN_GetSel(hItem);
+
+  // 秒（0..59）—— 新增
+  hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_SECOND);
+  g_AlarmSecond = (uint8_t)DROPDOWN_GetSel(hItem);
+
+  // AM/PM（0=AM,1=PM）
   hItem = WM_GetDialogItem(hWin, ID_DROPDOWN_RING_AMPM);
   int is_pm = DROPDOWN_GetSel(hItem);
-  
-  // 转换为24小时制
-  if (is_pm == 1) { // PM
-    g_AlarmHour = (hour_12 % 12) + 12;
-    if (g_AlarmHour == 24) g_AlarmHour = 12;
-  } else { // AM
-    g_AlarmHour = hour_12 % 12;
-    if (g_AlarmHour == 0) g_AlarmHour = 0;
+
+  // 12h -> 24h
+  if (is_pm == 0) { // AM
+    g_AlarmHour = (hour_12 == 12) ? 0 : hour_12;
+  } else {          // PM
+    g_AlarmHour = (hour_12 == 12) ? 12 : (hour_12 + 12);
   }
-  
-  // 获取启用状态
+
+  // 启用状态
   hItem = WM_GetDialogItem(hWin, ID_CHECKBOX_RING_ENABLE);
-  g_AlarmEnable = CHECKBOX_GetState(hItem);
-  
-  // 重置触发标志
+  g_AlarmEnable = (uint8_t)CHECKBOX_GetState(hItem);
+
+  // 重置触发闩锁
   g_AlarmTriggered = 0;
-  
-  // 调试输出
-  //printf("Alarm set: %02d:%02d, Enable: %d\n", g_AlarmHour, g_AlarmMinute, g_AlarmEnable);
 }
+
 
 /*********************************************************************
 *
@@ -2741,19 +2762,24 @@ void CheckAlarmTrigger(void) {
   get_current_calendar(&current_calendar);
   
   // 检查小时和分钟是否匹配
-  if (current_calendar.hour == g_AlarmHour && current_calendar.minute == g_AlarmMinute) {
+  if (current_calendar.hour == g_AlarmHour && current_calendar.minute == g_AlarmMinute  &&current_calendar.second==g_AlarmSecond) {
     // 避免在同一分钟内重复触发
-    if (current_calendar.second == 0) {
-      g_AlarmTriggered = 1;
-      TriggerAlarm();
-    }
+//    if (current_calendar.second == 0) {
+//      g_AlarmTriggered = 1;
+//      TriggerAlarm();
+//    }
   
+         g_AlarmTriggered = 1;
+         TriggerAlarm(); 
+    
     
   } else {
     // 重置触发标志，允许下次触发
     g_AlarmTriggered = 0;
   }
 }
+
+
 
 /*********************************************************************
 *
@@ -3658,7 +3684,7 @@ FRESULT ScanMidiFiles(char files[][50], uint8_t* count) {
     *count = 0;
 
     // 打开根目录（根据你的SDPath调整）
-    res = f_opendir(&dir, "midi");  
+    res = f_opendir(&dir, "0:/");  
     if (res != FR_OK) {
         //printf("Failed to open directory: %d\n", res);
         return res;
