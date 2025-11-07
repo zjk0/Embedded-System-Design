@@ -1618,7 +1618,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
 }
 
 
-
+WM_HWIN hTextPianoFreq;
 
 // 钢琴窗口的回调函数（扩展音域版本）
 static void _cbPianoDialog(WM_MESSAGE * pMsg) {
@@ -1691,6 +1691,7 @@ static void _cbPianoDialog(WM_MESSAGE * pMsg) {
     BUTTON_SetText(hItem, play_chinese);
     
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_FREQ);
+    hTextPianoFreq = hItem;
     TEXT_SetFont(hItem, &GUI_Fontchinese);
     TEXT_SetTextColor(hItem, GUI_BLACK);
     TEXT_SetTextAlign(hItem, GUI_TA_LEFT);
@@ -3014,12 +3015,22 @@ void Calculate_Power_Spectrum(void)
   
   // 在频域窗口中显示峰值频率
   Display_Peak_Frequency(peak_frequency);
-  UpdateFreqDisplay(hPianoWin, peak_frequency);
+  // UpdateFreqDisplay(hPianoWin, peak_frequency);
   //Update_Peak_Frequency_Display(peak_frequency);
    
 }
 
-
+void Calculate_Recording_Main_Freq (void) {
+  // 执行FFT计算
+  arm_cfft_f32(&arm_cfft_sR_f32_len512, data_in, 0, 1);
+  arm_cmplx_mag_f32(data_in, data_out, NPT);
+  
+  // 归一化处理
+  for(int j = 0; j < NPT; j++)
+  {
+    data_out[j] = data_out[j] / 2;
+  }
+}
 
 
  // 更新频谱显示（实时版本）
@@ -3893,7 +3904,8 @@ void Process_AudioPitch(void)
         if (fft_data_ready)
         {
             fft_data_ready = 0;
-            Calculate_Power_Spectrum(); // 计算data_out
+            // Calculate_Power_Spectrum(); // 计算data_out
+            Calculate_Recording_Main_Freq();
 
             float freq = FindMainFreq(data_out, 44000.0f / NPT, NPT);
             if (freq_count < MAX_RECORD_LEN)
@@ -3901,8 +3913,9 @@ void Process_AudioPitch(void)
 
             char str[32];
             sprintf(str, "%s: %.1f Hz", frequence_chinese, freq);
-            GUI_DispStringAt(str, 10, 240);
-            Display_Peak_Frequency(freq);
+            TEXT_SetText(hTextPianoFreq, str);
+            // GUI_DispStringAt(str, 10, 240);
+            // Display_Peak_Frequency(freq);
             
         }
     }
