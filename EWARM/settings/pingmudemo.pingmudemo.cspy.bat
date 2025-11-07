@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
+"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" "--debug_file=%~1" --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
+"F:\EWARM_8321\common\bin\cspybat" -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.general.xcl" "--debug_file=%~1" --backend -f "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\EWARM\settings\pingmudemo.pingmudemo.driver.xcl" 
 
 @echo off 
 :end

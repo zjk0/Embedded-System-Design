@@ -141,8 +141,6 @@ void Generate_Window(void);
 #define MAX_AUTO_RELOAD 65535         // 16位自动重装载值最大值
 void CalculateTimerConfig(float frequency, uint32_t* psc, uint32_t* arr) ;
 
-
-
 // 修改音符结构体，添加停顿信息
 typedef struct {
     float frequency;    // 音符频率
@@ -200,7 +198,7 @@ static int graphVSizeX = NPT * 2; // 图表X轴虚拟尺寸
 void Display_Peak_Frequency(float frequency);
 void Update_Peak_Frequency_Display(float frequency);
 // 在全局变量区域定义
-static WM_HWIN hPeakFreqText = 0;
+// static WM_HWIN hPeakFreqText = 0;
 
 
 // MIDI相关定义
@@ -418,6 +416,7 @@ void UpdateStatusText(WM_HWIN hWin, const char *msg, GUI_COLOR color);
 
 
 #define ID_DROPDOWN_RING_SECOND   (GUI_ID_USER + 0x5F)
+#define ID_TEXT_PEAK_FREQ          (GUI_ID_USER + 0x60)
 
 
 // 频谱显示模式
@@ -527,7 +526,7 @@ const char no_midi_chinese[] = "\xe6\x97\xa0\xe6\x96\x87\xe4\xbb\xb6";
 extern GUI_CONST_STORAGE GUI_FONT GUI_Fontchinese40;
 const char alarm_come_chinese_40[] = "\xe9\x97\xb9\xe9\x92\x9f\xe5\x88\xb0\xe4\xba\x86";
 
-GRAPH_DATA_Handle hData;
+// GRAPH_DATA_Handle hData;
 int data;
 static int g_TimerActive = 1; //1=active 0=no active
 
@@ -553,7 +552,11 @@ extern DMA_HandleTypeDef hdma_adc3;
 
 // 时域图表句柄全局变量
 WM_HWIN hGraphTimeDomain = 0; 
-WM_HWIN hGraphFrequencyDomain = 0; 
+WM_HWIN hGraphFrequencyDomain = 0;
+GRAPH_DATA_Handle hDataTimeDomain;
+GRAPH_DATA_Handle hDataFreqDomain;
+GRAPH_SCALE_Handle hScaleFreq;
+WM_HWIN hPeakFreqText = 0;
 
 
 //width=64, height=64
@@ -1125,8 +1128,8 @@ static const GUI_WIDGET_CREATE_INFO _aFreqDomainDialogCreate[] = {
     // 新增模式切换按钮
   { BUTTON_CreateIndirect, "MODE1", ID_BUTTON_MODE1, 40, 5, 80, 30, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "MODE2", ID_BUTTON_MODE2, 130, 5, 80, 30, 0, 0x0, 0 },
+  { TEXT_CreateIndirect, "PeakFreq", ID_TEXT_PEAK_FREQ, 240, 10, 150, 20, 0, 0x0, 0 },
 };
-
 
 
 
@@ -1358,6 +1361,16 @@ static void _cbTimeDomainDialog(WM_MESSAGE * pMsg) {
 
     BSP_AUDIO_IN_Init(SAI_AUDIO_FREQUENCY_44K, DEFAULT_AUDIO_IN_BIT_RESOLUTION, 1);
     BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
+
+    hDataTimeDomain = GRAPH_DATA_YT_Create(GUI_GREEN, ADC_BUFFER_SIZE, 0, 0);
+    GRAPH_AttachData(hGraphTimeDomain, hDataTimeDomain);
+      
+    // 调整X轴虚拟尺寸，使波形向左移动
+    GRAPH_SetVSizeX(hGraphTimeDomain, 1000); // 减小虚拟尺寸，使波形向左移动
+    
+    // 调整Y轴虚拟尺寸
+    GRAPH_SetVSizeY(hGraphTimeDomain, 1000);
+
     break;
     
   case WM_NOTIFY_PARENT:
@@ -1378,6 +1391,7 @@ static void _cbTimeDomainDialog(WM_MESSAGE * pMsg) {
         hGraphTimeDomain = 0;
         BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
         WM_DeleteWindow(pMsg->hWin);
+        // GRAPH_DATA_YT_Delete(hDataTimeDomain);
         CreateADCMainWindow();
         break;
       }
@@ -1398,21 +1412,15 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
   WM_HWIN hItem;
   int     NCode;
   int     Id;
-  static WM_HWIN hGraph = 0;
+  // static WM_HWIN hGraph = 0;
 
   switch (pMsg->MsgId) {
   case WM_INIT_DIALOG:
     // 初始化频域窗口
-    hGraph = WM_GetDialogItem(pMsg->hWin, ID_GRAPH_FREQ_DOMAIN);
-    hGraphFrequencyDomain = hGraph;
+    hGraphFrequencyDomain = WM_GetDialogItem(pMsg->hWin, ID_GRAPH_FREQ_DOMAIN);
     
     // 初始化FFT
     Init_FFT();
-    
-    // 配置图表外观
-    GRAPH_SetGridVis(hGraph, 0); // 不显示网格
-    GRAPH_SetColor(hGraph, GUI_BLACK, GRAPH_CI_BK);
-    GRAPH_SetColor(hGraph, GUI_WHITE, GRAPH_CI_GRID);
     
     // 初始化按钮
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_FREQ_BACK);
@@ -1442,9 +1450,30 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
     BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
     
     // 添加频率轴标签
-    Add_Frequency_Labels(hGraph);
+    Add_Frequency_Labels(hGraphFrequencyDomain);
+
+    hDataFreqDomain = GRAPH_DATA_YT_Create(GUI_BLUE,  10*NPT, 0, 0);
+    GRAPH_AttachData(hGraphFrequencyDomain, hDataFreqDomain);
     
+    // 创建并配置比例尺
+    hScaleFreq = GRAPH_SCALE_Create(0, GUI_TA_LEFT, GRAPH_SCALE_CF_VERTICAL, 0);
+    GRAPH_AttachScale(hGraphFrequencyDomain, hScaleFreq);
     
+    // 增加X轴虚拟尺寸，使波形能够完整显示
+    GRAPH_SetVSizeX(hGraphFrequencyDomain, 2*NPT); // 加倍虚拟尺寸
+    
+    // 调整Y轴虚拟尺寸
+    GRAPH_SetVSizeY(hGraphFrequencyDomain, 2000); // 增加Y轴范围
+    
+    // 配置图表外观
+    GRAPH_SetGridVis(hGraphFrequencyDomain, 1); // 不显示网格
+    GRAPH_SetColor(hGraphFrequencyDomain, GUI_BLACK, GRAPH_CI_BK);
+    GRAPH_SetColor(hGraphFrequencyDomain, GUI_WHITE, GRAPH_CI_GRID);
+
+    hPeakFreqText = WM_GetDialogItem(pMsg->hWin, ID_TEXT_PEAK_FREQ);
+    TEXT_SetFont(hPeakFreqText, &GUI_Fontchinese);
+    TEXT_SetTextColor(hPeakFreqText, GUI_YELLOW);
+    TEXT_SetBkColor(hPeakFreqText, GUI_BLACK);  
     
     
     // 创建定时器用于实时更新
@@ -1461,11 +1490,11 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
       // 根据当前模式更新显示
       if (spectrumDisplayMode == SPECTRUM_MODE_NORMAL) {
         // 隐藏GRAPH控件（如果之前是圆形模式）
-        WM_ShowWindow(hGraph);
-        Update_Power_Spectrum_Display(hGraph);
+        WM_ShowWindow(hGraphFrequencyDomain);
+        Update_Power_Spectrum_Display(hGraphFrequencyDomain);
       } else {
         // 隐藏GRAPH控件，直接绘制在窗口上
-        WM_HideWindow(hGraph);
+        WM_HideWindow(hGraphFrequencyDomain);
         Update_Circular_Spectrum_Display(pMsg->hWin);
       }
       
@@ -1511,7 +1540,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
         if (spectrumDisplayMode == SPECTRUM_MODE_NORMAL) {
           // 图表模式：增加X轴虚拟尺寸
           graphVSizeX += 200;
-          GRAPH_SetVSizeX(hGraph, graphVSizeX);
+          GRAPH_SetVSizeX(hGraphFrequencyDomain, graphVSizeX);
         } else {
           // 圆形模式：增加半径
           circularSpectrumRadius += 10;
@@ -1529,7 +1558,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
           // 图表模式：减小X轴虚拟尺寸
           graphVSizeX -= 200;
           if (graphVSizeX < NPT) graphVSizeX = NPT;
-          GRAPH_SetVSizeX(hGraph, graphVSizeX);
+          GRAPH_SetVSizeX(hGraphFrequencyDomain, graphVSizeX);
         } else {
           // 圆形模式：减小半径
           circularSpectrumRadius -= 10;
@@ -1554,7 +1583,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
         BUTTON_SetBkColor(hItem, BUTTON_CI_UNPRESSED, GUI_RED);
         
         // 显示GRAPH控件
-        WM_ShowWindow(hGraph);
+        WM_ShowWindow(hGraphFrequencyDomain);
         needRedraw = 1; // 设置需要重绘标志
         break;
       }
@@ -1574,7 +1603,7 @@ static void _cbFreqDomainDialog(WM_MESSAGE * pMsg) {
         BUTTON_SetBkColor(hItem, BUTTON_CI_UNPRESSED, GUI_RED);
         
         // 隐藏GRAPH控件，我们将直接在窗口上绘制
-        WM_HideWindow(hGraph);
+        WM_HideWindow(hGraphFrequencyDomain);
         needRedraw = 1; // 设置需要重绘标志
         break;
       }
@@ -2888,26 +2917,26 @@ void Update_Waveform_Display(WM_HWIN hGraph)
   if (data_ready && hGraph != 0)
   {
     // 创建或获取GRAPH_DATA对象
-    static GRAPH_DATA_Handle hData = NULL;
-    if (hData == NULL)
-    {
-      hData = GRAPH_DATA_YT_Create(GUI_GREEN, ADC_BUFFER_SIZE, 0, 0);
-      GRAPH_AttachData(hGraph, hData);
+    // static GRAPH_DATA_Handle hData = NULL;
+    // if (hData == NULL)
+    // {
+    //   hData = GRAPH_DATA_YT_Create(GUI_GREEN, ADC_BUFFER_SIZE, 0, 0);
+    //   GRAPH_AttachData(hGraph, hData);
       
-    // 调整X轴虚拟尺寸，使波形向左移动
-    GRAPH_SetVSizeX(hGraph, 1000); // 减小虚拟尺寸，使波形向左移动
+    // // 调整X轴虚拟尺寸，使波形向左移动
+    // GRAPH_SetVSizeX(hGraph, 1000); // 减小虚拟尺寸，使波形向左移动
     
-    // 调整Y轴虚拟尺寸
-    GRAPH_SetVSizeY(hGraph, 1000);
-    }
+    // // 调整Y轴虚拟尺寸
+    // GRAPH_SetVSizeY(hGraph, 1000);
+    // }
     
     // 清除旧数据
-    GRAPH_DATA_YT_Clear(hData);
+    GRAPH_DATA_YT_Clear(hDataTimeDomain);
     
     // 添加新数据到图表（使用整个缓冲区）
     for (int i = 0; i < BUFSIZE; i++)
     {
-      GRAPH_DATA_YT_AddValue(hData, audio_input[i*2]/5 +100);
+      GRAPH_DATA_YT_AddValue(hDataTimeDomain, audio_input[i*2]/5 +100);
       //GRAPH_DATA_YT_AddValue(hData, fftInput[i]);
     }
     
@@ -2996,49 +3025,49 @@ void Calculate_Power_Spectrum(void)
  // 更新频谱显示（实时版本）
 void Update_Power_Spectrum_Display(WM_HWIN hGraph)
 {
-  static GRAPH_DATA_Handle hData = NULL;
-  static GRAPH_SCALE_Handle hScale = NULL;
+  // static GRAPH_DATA_Handle hData = NULL;
+  // static GRAPH_SCALE_Handle hScale = NULL;
   
-  if (hData == NULL)
-  {
-    // 创建GRAPH_DATA对象，增加数据点数量
-    hData = GRAPH_DATA_YT_Create(GUI_BLUE,  10*NPT, 0, 0);
-    GRAPH_AttachData(hGraph, hData);
+  // if (hData == NULL)
+  // {
+  //   // 创建GRAPH_DATA对象，增加数据点数量
+  //   hData = GRAPH_DATA_YT_Create(GUI_BLUE,  10*NPT, 0, 0);
+  //   GRAPH_AttachData(hGraph, hData);
     
-    // 创建并配置比例尺
-    hScale = GRAPH_SCALE_Create(0, GUI_TA_LEFT, GRAPH_SCALE_CF_VERTICAL, 0);
-    GRAPH_AttachScale(hGraph, hScale);
+  //   // 创建并配置比例尺
+  //   hScale = GRAPH_SCALE_Create(0, GUI_TA_LEFT, GRAPH_SCALE_CF_VERTICAL, 0);
+  //   GRAPH_AttachScale(hGraph, hScale);
     
-    // 增加X轴虚拟尺寸，使波形能够完整显示
-    GRAPH_SetVSizeX(hGraph, 2*NPT); // 加倍虚拟尺寸
+  //   // 增加X轴虚拟尺寸，使波形能够完整显示
+  //   GRAPH_SetVSizeX(hGraph, 2*NPT); // 加倍虚拟尺寸
     
-    // 调整Y轴虚拟尺寸
-    GRAPH_SetVSizeY(hGraph, 2000); // 增加Y轴范围
+  //   // 调整Y轴虚拟尺寸
+  //   GRAPH_SetVSizeY(hGraph, 2000); // 增加Y轴范围
     
-    // 配置图表外观
-    GRAPH_SetGridVis(hGraph, 1); // 不显示网格
-    GRAPH_SetColor(hGraph, GUI_BLACK, GRAPH_CI_BK);
-    GRAPH_SetColor(hGraph, GUI_WHITE, GRAPH_CI_GRID);
-  }
+  //   // 配置图表外观
+  //   GRAPH_SetGridVis(hGraph, 1); // 不显示网格
+  //   GRAPH_SetColor(hGraph, GUI_BLACK, GRAPH_CI_BK);
+  //   GRAPH_SetColor(hGraph, GUI_WHITE, GRAPH_CI_GRID);
+  // }
   
   // 清除旧数据
-  GRAPH_DATA_YT_Clear(hData);
+  GRAPH_DATA_YT_Clear(hDataFreqDomain);
   
   // 添加分段频谱数据到图表
   for (int i = 0; i < 3*NPT+100; i++) // 使用实际频段数量
   {
     if(i<=221)
     {
-      GRAPH_DATA_YT_AddValue(hData, data_out[i]/NPT);
+      GRAPH_DATA_YT_AddValue(hDataFreqDomain, data_out[i]/NPT);
     }
     if(i>=291)
       {
-      GRAPH_DATA_YT_AddValue(hData, data_out[i]/NPT);
+      GRAPH_DATA_YT_AddValue(hDataFreqDomain, data_out[i]/NPT);
        }
   }
   
   // 刷新图表
-  WM_InvalidateWindow(hGraph);
+  WM_InvalidateWindow(hGraphFrequencyDomain);
   // BSP_AUDIO_IN_Record((uint16_t*)audio_input, BUFSIZE * 2);
 }
 
@@ -3353,35 +3382,35 @@ void Update_Circular_Spectrum_Display(WM_HWIN hWin)
 // 在频域窗口中显示峰值频率
 void Display_Peak_Frequency(float frequency)
 {
-  // 检查频域窗口是否存在
-  if (hGraphFrequencyDomain == 0) return;
+  // // 检查频域窗口是否存在
+  // if (hGraphFrequencyDomain == 0) return;
   
-  // 获取频域窗口的父窗口
-  WM_HWIN hParent = WM_GetParent(hGraphFrequencyDomain);
-  if (hParent == 0) return;
+  // // 获取频域窗口的父窗口
+  // WM_HWIN hParent = WM_GetParent(hGraphFrequencyDomain);
+  // if (hParent == 0) return;
   
-  // 查找或创建峰值频率显示文本控件
-  static WM_HWIN hPeakFreqText = 0;
-  if (hPeakFreqText == 0)
-  {
-    // 创建文本控件
-    hPeakFreqText = TEXT_CreateEx(
-      240,  // x位置
-      10,  // y位置
-      150, // 宽度
-      20,  // 高度
-      hParent, // 父窗口
-      WM_CF_SHOW | WM_CF_STAYONTOP, // 标志
-      0, 
-      GUI_ID_TEXT0, // ID
-      ""
-    );
+  // // 查找或创建峰值频率显示文本控件
+  // static WM_HWIN hPeakFreqText = 0;
+  // if (hPeakFreqText == 0)
+  // {
+  //   // 创建文本控件
+  //   hPeakFreqText = TEXT_CreateEx(
+  //     240,  // x位置
+  //     10,  // y位置
+  //     150, // 宽度
+  //     20,  // 高度
+  //     hParent, // 父窗口
+  //     WM_CF_SHOW | WM_CF_STAYONTOP, // 标志
+  //     0, 
+  //     GUI_ID_TEXT0, // ID
+  //     ""
+  //   );
     
-    // 设置文本样式
-    TEXT_SetFont(hPeakFreqText, &GUI_Fontchinese);
-    TEXT_SetTextColor(hPeakFreqText, GUI_YELLOW);
-    TEXT_SetBkColor(hPeakFreqText, GUI_BLACK);
-  }
+  //   // 设置文本样式
+  //   TEXT_SetFont(hPeakFreqText, &GUI_Fontchinese);
+  //   TEXT_SetTextColor(hPeakFreqText, GUI_YELLOW);
+  //   TEXT_SetBkColor(hPeakFreqText, GUI_BLACK);
+  // }
   
   // 格式化频率文本
   char freq_text[30];
@@ -3684,7 +3713,7 @@ FRESULT ScanMidiFiles(char files[][50], uint8_t* count) {
     *count = 0;
 
     // 打开根目录（根据你的SDPath调整）
-    res = f_opendir(&dir, "0:/");  
+    res = f_opendir(&dir, "midi");  
     if (res != FR_OK) {
         //printf("Failed to open directory: %d\n", res);
         return res;

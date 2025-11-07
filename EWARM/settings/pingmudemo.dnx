@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <StLinkDriver>
-        <stlinkserialNo>87145438</stlinkserialNo>
+        <stlinkserialNo>43253334</stlinkserialNo>
         <stlinkfoundProbes />
         <stlinkResetStyle>0</stlinkResetStyle>
         <stlinkResetStrategy>2</stlinkResetStrategy>
@@ -9,7 +9,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>1457161322</Checksum>
+        <Checksum>4263389046</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -131,7 +131,7 @@
         <A0>_ "C:\Users\thomasto\Projects\CMSIS_5\CMSIS\DSP\Include\arm_math.h" ""</A0>
         <A1>_ "C:\Users\thomasto\Projects\CMSIS_5\CMSIS\DSP\Source\ComplexMathFunctions\arm_cmplx_mag_f32.c" ""</A1>
         <A2>_ "C:\Users\thomasto\Projects\CMSIS_5\CMSIS\DSP\Source\TransformFunctions\arm_cfft_f32.c" ""</A2>
-        <A3>_ "C:\Users\thomasto\Projects\CMSIS_5\CMSIS\DSP\Source\TransformFunctions\arm_rfft_fast_init_f32.c" ""</A3>
+        <A3>_ "C:\Users\thomasto\Projects\CMSIS_5\CMSIS\DSP\Source\TransformFunctions\arm_rfft_fast_init_f32.c" "F:\none\HelloWorld\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\Drivers\CMSIS\DSP\Source\TransformFunctions\arm_rfft_fast_init_f32.c"</A3>
         <A4>_ "F:\none\Study\Electron\Embedded-System-Design\pingmudemo11\pingmudemo\Src\main.c" ""</A4>
         <A5>_ "F:\none\Study\Electron\Embedded-System-Design\pingmudemo\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_ctlreq.c" ""</A5>
         <A6>_ "F:\none\Study\Electron\Embedded-System-Design\pingmudemo\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_ioreq.c" ""</A6>
